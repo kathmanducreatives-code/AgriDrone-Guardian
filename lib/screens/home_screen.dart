@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 
 import '../providers/app_provider.dart';
 import '../widgets/crop_card.dart';
+import '../widgets/status_bar.dart';
+import '../widgets/telemetry_hud.dart';
+import '../services/connectivity_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,76 +22,116 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('AgriDrone Guardian'),
         actions: [
+          const ConnectionStatusLabel(),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.of(context).pushNamed('/settings'),
           ),
         ],
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(4),
+          child: StatusBar(),
+        ),
       ),
-      body: app.isLoading
-          ? const _LoadingSkeleton()
-          : RefreshIndicator(
-              onRefresh: () => app.refreshNow(),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _Header(app: app, lastScan: lastScan),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Select Crop',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  GridView.count(
-                    crossAxisCount:
-                        MediaQuery.of(context).size.width < 600 ? 2 : 3,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+      body: Stack(
+        children: [
+          app.isLoading
+              ? const _LoadingSkeleton()
+              : RefreshIndicator(
+                  onRefresh: () => app.refreshNow(),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
                     children: [
-                      CropCard(
-                        label: 'Rice',
-                        icon: Icons.grass,
-                        selected: app.selectedCrop == 'rice',
-                        onTap: () => app.setCrop('rice'),
+                      _Header(app: app, lastScan: lastScan),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Select Crop',
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      CropCard(
-                        label: 'Wheat',
-                        icon: Icons.agriculture,
-                        selected: app.selectedCrop == 'wheat',
-                        onTap: () => app.setCrop('wheat'),
-                      ),
-                      CropCard(
-                        label: 'Maize',
-                        icon: Icons.spa,
-                        selected: app.selectedCrop == 'maize',
-                        onTap: () => app.setCrop('maize'),
-                      ),
-                      CropCard(
-                        label: 'Potato',
-                        icon: Icons.local_florist,
-                        selected: app.selectedCrop == 'potato',
-                        onTap: () => app.setCrop('potato'),
-                      ),
-                      CropCard(
-                        label: 'Tomato',
-                        icon: Icons.eco,
-                        selected: app.selectedCrop == 'tomato',
-                        onTap: () => app.setCrop('tomato'),
-                      ),
-                      CropCard(
-                        label: 'Pepper',
-                        icon: Icons.park,
-                        selected: app.selectedCrop == 'pepper',
-                        onTap: () => app.setCrop('pepper'),
+                      const SizedBox(height: 8),
+                      GridView.count(
+                        crossAxisCount:
+                            MediaQuery.of(context).size.width < 600 ? 2 : 3,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: 1.2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        children: [
+                          CropCard(
+                            label: 'Rice',
+                            icon: Icons.grass,
+                            selected: app.selectedCrop == 'rice',
+                            onTap: () => app.setCrop('rice'),
+                          ),
+                          CropCard(
+                            label: 'Wheat',
+                            icon: Icons.agriculture,
+                            selected: app.selectedCrop == 'wheat',
+                            onTap: () => app.setCrop('wheat'),
+                          ),
+                          CropCard(
+                            label: 'Maize',
+                            icon: Icons.spa,
+                            selected: app.selectedCrop == 'maize',
+                            onTap: () => app.setCrop('maize'),
+                          ),
+                          CropCard(
+                            label: 'Potato',
+                            icon: Icons.local_florist,
+                            selected: app.selectedCrop == 'potato',
+                            onTap: () => app.setCrop('potato'),
+                          ),
+                          CropCard(
+                            label: 'Tomato',
+                            icon: Icons.eco,
+                            selected: app.selectedCrop == 'tomato',
+                            onTap: () => app.setCrop('tomato'),
+                          ),
+                          CropCard(
+                            label: 'Pepper',
+                            icon: Icons.park,
+                            selected: app.selectedCrop == 'pepper',
+                            onTap: () => app.setCrop('pepper'),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
+          if (app.isCapturing)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Colors.emerald),
+                    SizedBox(height: 16),
+                    Text(
+                      'Scanning...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+          const TelemetryHud(),
+        ],
+      ),
+      floatingActionButton: app.connectionState == DroneConnectionState.direct
+          ? FloatingActionButton.extended(
+              onPressed: app.isCapturing ? null : () => app.captureImage(context),
+              backgroundColor: Colors.emerald,
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Capture'),
+            )
+          : null,
     );
   }
 }

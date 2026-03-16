@@ -5,9 +5,12 @@ import 'package:flutter/material.dart';
 import '../models/detection_model.dart';
 import '../models/soil_model.dart';
 import '../services/firebase_service.dart';
+import '../services/connectivity_service.dart';
+import 'package:http/http.dart' as http;
 
 class AppProvider extends ChangeNotifier {
   final FirebaseService _service = FirebaseService();
+  final ConnectivityService _connectivityService = ConnectivityService();
 
   bool isLoading = true;
   bool firebaseConnected = false;
@@ -18,11 +21,17 @@ class AppProvider extends ChangeNotifier {
   List<DetectionModel> detections = [];
   List<SoilModel> soil = [];
   DroneStatus? droneStatus;
+  
+  DroneConnectionState connectionState = DroneConnectionState.offline;
+  Duration currentLatency = Duration.zero;
+  bool isCapturing = false;
 
   StreamSubscription? _detSub;
   StreamSubscription? _soilSub;
   StreamSubscription? _droneSub;
   StreamSubscription? _connSub;
+  StreamSubscription? _droneConnSub;
+  StreamSubscription? _latencySub;
 
   Future<void> init() async {
     try {
@@ -33,8 +42,21 @@ class AppProvider extends ChangeNotifier {
 
       _connSub = _service.connectionStream().listen((connected) {
         firebaseConnected = connected;
+        _connectivityService.updateFirebaseStatus(connected);
         notifyListeners();
       });
+
+      _droneConnSub = _connectivityService.connectionStateStream.listen((state) {
+        connectionState = state;
+        notifyListeners();
+      });
+
+      _latencySub = _connectivityService.latencyStream.listen((latency) {
+        currentLatency = latency;
+        notifyListeners();
+      });
+
+      _connectivityService.startPinging();
 
       final cachedDetections = await _service.loadCachedDetections();
       if (cachedDetections.isNotEmpty) {
@@ -118,7 +140,51 @@ class AppProvider extends ChangeNotifier {
     _soilSub?.cancel();
     _droneSub?.cancel();
     _connSub?.cancel();
+    _droneConnSub?.cancel();
+    _latencySub?.cancel();
+    _connectivityService.dispose();
     super.dispose();
+  }
+
+  Future<void> captureImage(BuildContext context) async {
+    if (connectionState != DroneConnectionState.direct) return;
+
+    isCapturing = true;
+    notifyListeners();
+
+    try {
+      final response = await http
+          .get(Uri.parse('http://${_connectivityService.droneIp}/capture'))
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Image captured successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        throw Exception('Failed to capture');
+      }
+    } on TimeoutException {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Server Wake-up in Progress (Handling cold start...)'),
+          duration: Duration(seconds: 5),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      isCapturing = false;
+      notifyListeners();
+    }
   }
 
   List<DetectionModel> _mockDetections() {
