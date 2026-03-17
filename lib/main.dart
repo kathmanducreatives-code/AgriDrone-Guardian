@@ -143,8 +143,8 @@ class _AppShellState extends State<AppShell> {
                 ),
                 if (context.watch<AppProvider>().isDevMode)
                   const NavigationRailDestination(
-                    icon: Icon(Icons.terminal_outlined),
-                    selectedIcon: Icon(Icons.terminal),
+                    icon: Icon(Icons.bug_report_outlined),
+                    selectedIcon: Icon(Icons.bug_report),
                     label: Text('Dev'),
                   ),
               ],
@@ -172,7 +172,7 @@ class _AppShellState extends State<AppShell> {
                     icon: Icon(Icons.water_drop), label: 'Soil'),
                 if (context.watch<AppProvider>().isDevMode)
                   const NavigationDestination(
-                    icon: Icon(Icons.terminal), label: 'Developer'),
+                    icon: Icon(Icons.bug_report), label: 'Developer'),
               ],
             ),
     );
