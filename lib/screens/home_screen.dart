@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 
 import '../providers/app_provider.dart';
 import '../models/detection_model.dart';
+import '../widgets/telemetry_hud.dart';
+import '../widgets/status_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,36 +17,96 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF5FBF5),
       body: app.isLoading
           ? const _LoadingSkeleton()
-          : RefreshIndicator(
-              color: const Color(0xFF2E7D32),
-              backgroundColor: Colors.white,
-              onRefresh: () => app.refreshNow(),
-              child: CustomScrollView(
-                slivers: [
-                  _AgriAppBar(app: app),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        _DroneStatusCard(app: app),
-                        const SizedBox(height: 16),
-                        _StatsRow(app: app),
-                        const SizedBox(height: 24),
-                        const _SectionHeader(title: 'Select Crop to Monitor'),
-                        const SizedBox(height: 12),
-                        _CropSelector(app: app),
-                        const SizedBox(height: 24),
-                        if (app.detections.isNotEmpty) ...[
-                          const _SectionHeader(title: 'Recent Detections'),
-                          const SizedBox(height: 12),
-                          ...app.detections.take(3).map((d) => _RecentDetectionTile(d: d)),
-                        ],
-                      ]),
-                    ),
+          : Stack(
+              children: [
+                RefreshIndicator(
+                  color: const Color(0xFF2E7D32),
+                  backgroundColor: Colors.white,
+                  onRefresh: () => app.refreshNow(),
+                  child: CustomScrollView(
+                    slivers: [
+                      _AgriAppBar(app: app),
+                      SliverToBoxAdapter(child: const StatusBar()),
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            const SizedBox(height: 16),
+                            _DroneStatusCard(app: app),
+                            const SizedBox(height: 16),
+                            _StatsRow(app: app),
+                            const SizedBox(height: 24),
+                            const _SectionHeader(title: 'Select Crop to Monitor'),
+                            const SizedBox(height: 12),
+                            _CropSelector(app: app),
+                            const SizedBox(height: 24),
+                            if (app.detections.isNotEmpty) ...[
+                              const _SectionHeader(title: 'Recent Detections'),
+                              const SizedBox(height: 12),
+                              ...app.detections.take(3).map((d) => _RecentDetectionTile(d: d)),
+                            ],
+                          ]),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                const TelemetryHud(),
+                if (app.isScanning) const _ScanningOverlay(),
+              ],
+            ),
+      floatingActionButton: app.connectionState == DroneConnectionState.direct
+          ? FloatingActionButton.extended(
+              onPressed: app.isScanning ? null : () => app.triggerCapture(),
+              backgroundColor: const Color(0xFF2E7D32),
+              icon: const Icon(Icons.camera_alt, color: Colors.white),
+              label: const Text('Capture', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
+    );
+  }
+}
+
+class _ScanningOverlay extends StatelessWidget {
+  const _ScanningOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black.withOpacity(0.7),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 80,
+              height: 80,
+              child: CircularProgressIndicator(
+                strokeWidth: 6,
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2E7D32)),
               ),
             ),
+            const SizedBox(height: 24),
+            const Text(
+              'SCANNING...',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Analyzing crop health via ESP32-CAM',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

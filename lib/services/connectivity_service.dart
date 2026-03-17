@@ -67,6 +67,16 @@ class ConnectivityService {
     }
   }
 
+  Future<bool> triggerCapture() async {
+    try {
+      final response = await http.get(Uri.parse('http://$droneIp/capture')).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Local capture failed: $e');
+      return false;
+    }
+  }
+
   void dispose() {
     _pingTimer?.cancel();
     _connectionStateController.close();

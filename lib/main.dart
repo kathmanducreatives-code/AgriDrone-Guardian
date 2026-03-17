@@ -9,6 +9,7 @@ import 'screens/home_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/soil_screen.dart';
 import 'screens/settings_screen.dart';
+import 'widgets/status_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -139,7 +140,14 @@ class _AppShellState extends State<AppShell> {
                 ),
               ],
             ),
-          Expanded(child: screens[index]),
+          Expanded(
+            child: Column(
+              children: [
+                const StatusBar(),
+                Expanded(child: screens[index]),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: isWeb
