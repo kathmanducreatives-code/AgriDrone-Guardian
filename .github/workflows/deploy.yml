@@ -1,27 +1,33 @@
-name: Build and Deploy to Vercel
+name: Deploy AgriDrone Guardian to Vercel
+
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.29.0' # Matches the latest stable used in this project
           channel: 'stable'
-          
+
       - name: Build Web
-        run: flutter build web --release
-        
+        run: |
+          chmod +x build_web.sh
+          ./build_web.sh
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./build/web
+          working-directory: ./
+          vercel-args: '--prod' # Deploy directly to production

@@ -82,8 +82,10 @@ class ConnectivityService {
     try {
       final response = await http.get(Uri.parse('http://$droneIp/START')).timeout(const Duration(seconds: 10));
       return 'Status: ${response.statusCode} - ${response.body}';
+    } on TimeoutException {
+      return 'Connection Failed: Timeout (10s) - Ensure you are on the drone\'s WiFi network.';
     } catch (e) {
-      return 'Connection Failed: $e';
+      return 'Connection Failed: $e - Drone unreachable.';
     }
   }
 
