@@ -16,7 +16,7 @@ class AppProvider extends ChangeNotifier {
   
   bool isLoading = false;
   String? errorMessage;
-  bool selectedCrop = 'rice';
+  String selectedCrop = 'rice';
   String selectedCropType = 'Rice'; // For drone/config/crop_type
   bool firebaseConnected = false;
   bool isScanning = false;
@@ -60,13 +60,12 @@ class AppProvider extends ChangeNotifier {
     });
 
     // Listen to config for crop type
-    _configSub = _firebase.firebaseReady ? FirebaseDatabase.instance.ref('drone/config/crop_type').onValue.listen((event) {
-      final val = event.snapshot.value;
-      if (val != null) {
-        selectedCropType = val.toString();
+    _configSub = _firebase.cropConfigStream().listen((crop) {
+      if (crop != null) {
+        selectedCropType = crop;
         notifyListeners();
       }
-    }) : null;
+    });
 
     // Connectivity Service
     _connectivity.startPinging();

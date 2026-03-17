@@ -146,7 +146,7 @@ class _AgriAppBar extends StatelessWidget {
         const SizedBox(width: 8),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.fromLTRB(20, 0, 0, 16),
+        titlePadding: const EdgeInsets.fromLTRB(20, 0, 0, 12),
         title: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +194,7 @@ class _ConnectivityCardsRow extends StatelessWidget {
     Color connColor = Colors.grey;
     String connLabel = 'Offline';
     if (state == DroneConnectionState.direct) {
-      connColor = Colors.emerald;
+      connColor = Colors.green;
       connLabel = 'Direct';
     } else if (state == DroneConnectionState.cloud) {
       connColor = Colors.blue;
@@ -214,7 +214,7 @@ class _ConnectivityCardsRow extends StatelessWidget {
 
   Color _getLatencyColor(Duration latency) {
     if (latency == Duration.zero) return Colors.grey;
-    if (latency.inMilliseconds < 50) return Colors.emerald;
+    if (latency.inMilliseconds < 50) return Colors.green;
     if (latency.inMilliseconds < 150) return Colors.orange;
     return Colors.red;
   }

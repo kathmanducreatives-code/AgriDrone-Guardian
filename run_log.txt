@@ -1,0 +1,375 @@
+Launching lib/main.dart on Chrome in debug mode...
+Waiting for connection from debug service on Chrome...              8.8s
+
+Flutter run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+Debug service listening on ws://127.0.0.1:60975/DpYfxX3MoWU=/ws
+A Dart VM Service on Chrome is available at: http://127.0.0.1:60975/DpYfxX3MoWU=
+The Flutter DevTools debugger and profiler on Chrome is available at: http://127.0.0.1:60975/DpYfxX3MoWU=/devtools/?uri=ws://127.0.0.1:60975/DpYfxX3MoWU=/ws
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:04.170Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:07.068Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:09.767Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:49.746Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:52.097Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:54.014Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>
+Starting application from main method in: org-dartlang-app:/web_entrypoint.dart.
+Persistence Error: Unsupported operation: setPersistenceEnabled() is not supported for web
+[2026-03-17T17:30:56.601Z]  @firebase/database:
+Error: FIREBASE FATAL ERROR: Database initialized multiple times. Please make sure the format of the database URL matches with each database() call. 
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:22167            fatal
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183548           repoManagerCreateRepo
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:183728           repoManagerDatabaseFromApp
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:190668           instanceFactory
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 994:39                  getOrInitializeService
+https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js 832:29                  getImmediate
+https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js 1:185078           getDatabase
+package:firebase_database_web/src/interop/database.dart 25:24                     getDatabaseInstance
+package:firebase_database_web/firebase_database_web.dart 36:46                    get [_delegate]
+package:firebase_database_web/firebase_database_web.dart 60:49                    ref
+package:firebase_database/src/firebase_database.dart 92:42                        ref
+package:agridrone_guardian/providers/app_provider.dart 64:108                     <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:agridrone_guardian/services/firebase_service.dart 79:3                    <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 504:7                complete
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 571:12               _asyncReturn
+package:firebase_messaging_web/firebase_messaging_web.dart 150:7                  <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 623:19               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 648:23               <fn>
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 594:19               <fn>
+dart-sdk/lib/async/zone.dart 962:54                                               runUnary
+dart-sdk/lib/async/future_impl.dart 222:18                                        handleValue
+dart-sdk/lib/async/future_impl.dart 948:44                                        handleValueCallback
+dart-sdk/lib/async/future_impl.dart 977:13                                        _propagateToListeners
+dart-sdk/lib/async/future_impl.dart 720:5                                         [_completeWithValue]
+dart-sdk/lib/async/future_impl.dart 804:7                                         <fn>
+dart-sdk/lib/async/schedule_microtask.dart 40:34                                  _microtaskLoop
+dart-sdk/lib/async/schedule_microtask.dart 49:5                                   _startMicrotaskLoop
+dart-sdk/lib/_internal/js_dev_runtime/private/ddc_runtime/operations.dart 118:77  tear
+dart-sdk/lib/_internal/js_dev_runtime/patch/async_patch.dart 188:69               <fn>

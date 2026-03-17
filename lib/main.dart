@@ -125,18 +125,18 @@ class _AppShellState extends State<AppShell> {
                   ],
                 ),
               ),
-              destinations: const [
-                NavigationRailDestination(
+              destinations: [
+                const NavigationRailDestination(
                   icon: Icon(Icons.home_outlined),
                   selectedIcon: Icon(Icons.home),
                   label: Text('Home'),
                 ),
-                NavigationRailDestination(
+                const NavigationRailDestination(
                   icon: Icon(Icons.analytics_outlined),
                   selectedIcon: Icon(Icons.analytics),
                   label: Text('Results'),
                 ),
-                NavigationRailDestination(
+                const NavigationRailDestination(
                   icon: Icon(Icons.water_drop_outlined),
                   selectedIcon: Icon(Icons.water_drop),
                   label: Text('Soil'),
@@ -164,11 +164,11 @@ class _AppShellState extends State<AppShell> {
           : NavigationBar(
               selectedIndex: index,
               onDestinationSelected: (i) => setState(() => index = i),
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-                NavigationDestination(
+              destinations: [
+                const NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+                const NavigationDestination(
                     icon: Icon(Icons.analytics), label: 'Results'),
-                NavigationDestination(
+                const NavigationDestination(
                     icon: Icon(Icons.water_drop), label: 'Soil'),
                 if (context.watch<AppProvider>().isDevMode)
                   const NavigationDestination(

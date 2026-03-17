@@ -129,6 +129,14 @@ class FirebaseService {
     });
   }
 
+  Stream<String?> cropConfigStream() {
+    if (_db == null) return Stream.value(null);
+    return _db!.ref('drone/config/crop_type').onValue.map((event) {
+      final val = event.snapshot.value;
+      return val?.toString();
+    });
+  }
+
   Future<List<DetectionModel>> fetchDetectionsOnce() async {
     if (_db == null) return [];
     try {
