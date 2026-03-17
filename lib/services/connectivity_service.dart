@@ -78,6 +78,15 @@ class ConnectivityService {
     }
   }
 
+  Future<String> forceStartDirect() async {
+    try {
+      final response = await http.get(Uri.parse('http://$droneIp/START')).timeout(const Duration(seconds: 10));
+      return 'Status: ${response.statusCode} - ${response.body}';
+    } catch (e) {
+      return 'Connection Failed: $e';
+    }
+  }
+
   void dispose() {
     _pingTimer?.cancel();
     _connectionStateController.close();

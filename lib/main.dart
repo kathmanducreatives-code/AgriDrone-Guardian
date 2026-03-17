@@ -99,6 +99,7 @@ class _AppShellState extends State<AppShell> {
     HomeScreen(),
     ResultScreen(),
     SoilScreen(),
+    DeveloperScreen(),
   ];
 
   @override
@@ -140,6 +141,12 @@ class _AppShellState extends State<AppShell> {
                   selectedIcon: Icon(Icons.water_drop),
                   label: Text('Soil'),
                 ),
+                if (context.watch<AppProvider>().isDevMode)
+                  const NavigationRailDestination(
+                    icon: Icon(Icons.terminal_outlined),
+                    selectedIcon: Icon(Icons.terminal),
+                    label: Text('Dev'),
+                  ),
               ],
             ),
           Expanded(
@@ -163,6 +170,9 @@ class _AppShellState extends State<AppShell> {
                     icon: Icon(Icons.analytics), label: 'Results'),
                 NavigationDestination(
                     icon: Icon(Icons.water_drop), label: 'Soil'),
+                if (context.watch<AppProvider>().isDevMode)
+                  const NavigationDestination(
+                    icon: Icon(Icons.terminal), label: 'Developer'),
               ],
             ),
     );

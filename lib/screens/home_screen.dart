@@ -136,20 +136,12 @@ class _AgriAppBar extends StatelessWidget {
               color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.terminal, color: Color(0xFF2E7D32)),
-          ),
-          onPressed: () => Navigator.of(context).pushNamed('/developer'),
-        ),
-        IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
+            child: Icon(
+              app.isDevMode ? Icons.settings : Icons.settings_outlined, 
+              color: const Color(0xFF2E7D32)
             ),
-            child: const Icon(Icons.settings_outlined, color: Color(0xFF2E7D32)),
           ),
-          onPressed: () => Navigator.of(context).pushNamed('/settings'),
+          onPressed: () => app.toggleDevMode(),
         ),
         const SizedBox(width: 8),
       ],

@@ -180,6 +180,15 @@ class FirebaseService {
     }
   }
 
+  Future<void> updateCropConfig(String cropType) async {
+    if (_db == null) return;
+    try {
+      await _db!.ref('drone/config/crop_type').set(cropType);
+    } catch (e) {
+      debugPrint('Error updating crop config: $e');
+    }
+  }
+
   Stream<String> rawDroneStream() {
     if (_db == null) return Stream.value('{}');
     return _db!.ref('drone').onValue.map((event) {

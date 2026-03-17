@@ -16,9 +16,11 @@ class AppProvider extends ChangeNotifier {
   
   bool isLoading = false;
   String? errorMessage;
-  String selectedCrop = 'rice';
+  bool selectedCrop = 'rice';
+  String selectedCropType = 'Rice'; // For drone/config/crop_type
   bool firebaseConnected = false;
   bool isScanning = false;
+  bool isDevMode = false;
 
   // Connectivity Suite State
   DroneConnectionState connectionState = DroneConnectionState.offline;
@@ -30,6 +32,7 @@ class AppProvider extends ChangeNotifier {
   StreamSubscription? _droneSub;
   StreamSubscription? _connSub;
   StreamSubscription? _latencySub;
+  StreamSubscription? _configSub;
 
   Future<void> init() async {
     _setLoading(true);
@@ -55,6 +58,15 @@ class AppProvider extends ChangeNotifier {
       firebaseConnected = true;
       notifyListeners();
     });
+
+    // Listen to config for crop type
+    _configSub = _firebase.firebaseReady ? FirebaseDatabase.instance.ref('drone/config/crop_type').onValue.listen((event) {
+      final val = event.snapshot.value;
+      if (val != null) {
+        selectedCropType = val.toString();
+        notifyListeners();
+      }
+    }) : null;
 
     // Connectivity Service
     _connectivity.startPinging();
@@ -87,6 +99,21 @@ class AppProvider extends ChangeNotifier {
   void setCrop(String crop) {
     selectedCrop = crop;
     notifyListeners();
+  }
+
+  void toggleDevMode() {
+    isDevMode = !isDevMode;
+    notifyListeners();
+  }
+
+  Future<void> updateCropConfig(String crop) async {
+    selectedCropType = crop;
+    notifyListeners();
+    await _firebase.updateCropConfig(crop);
+  }
+
+  Future<String> forceStartDirect() async {
+    return await _connectivity.forceStartDirect();
   }
 
   Future<void> refreshNow() async {
@@ -162,6 +189,7 @@ class AppProvider extends ChangeNotifier {
     _droneSub?.cancel();
     _connSub?.cancel();
     _latencySub?.cancel();
+    _configSub?.cancel();
     _connectivity.dispose();
     super.dispose();
   }
