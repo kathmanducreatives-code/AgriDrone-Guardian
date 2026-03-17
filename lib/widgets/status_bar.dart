@@ -40,7 +40,7 @@ class _StatusBarState extends State<StatusBar> with SingleTickerProviderStateMix
 
         switch (provider.connectionState) {
           case DroneConnectionState.direct:
-            color = Colors.emerald;
+            color = Colors.teal;
             text = 'DIRECT CONNECTION';
             pulse = true;
             break;
@@ -106,7 +106,7 @@ class ConnectionStatusLabel extends StatelessWidget {
         switch (provider.connectionState) {
           case DroneConnectionState.direct:
             icon = Icons.wifi;
-            color = Colors.emerald;
+            color = Colors.teal;
             label = 'Direct';
             break;
           case DroneConnectionState.cloud:

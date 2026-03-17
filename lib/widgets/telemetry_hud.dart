@@ -35,7 +35,7 @@ class TelemetryHud extends StatelessWidget {
                       icon: Icons.signal_wifi_4_bar,
                       label: 'RSSI',
                       value: isDirect ? '-42 dBm' : 'N/A',
-                      color: isDirect ? Colors.emerald : Colors.grey,
+                      color: isDirect ? Colors.teal : Colors.grey,
                     ),
                     _buildHudItem(
                       icon: Icons.timer_outlined,
@@ -101,7 +101,7 @@ class TelemetryHud extends StatelessWidget {
 
   Color _getLatencyColor(Duration latency) {
     if (latency == Duration.zero) return Colors.grey;
-    if (latency.inMilliseconds < 50) return Colors.emerald;
+    if (latency.inMilliseconds < 50) return Colors.teal;
     if (latency.inMilliseconds < 150) return Colors.orange;
     return Colors.red;
   }
