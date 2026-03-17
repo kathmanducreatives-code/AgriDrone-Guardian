@@ -3,10 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/app_provider.dart';
-import '../widgets/crop_card.dart';
-import '../widgets/status_bar.dart';
-import '../widgets/telemetry_hud.dart';
-import '../services/connectivity_service.dart';
+import '../models/detection_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -14,193 +11,386 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
-    final lastScan = app.detections.isNotEmpty
-        ? DateTime.fromMillisecondsSinceEpoch(app.detections.first.timestamp)
-        : null;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('AgriDrone Guardian'),
-        actions: [
-          const ConnectionStatusLabel(),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).pushNamed('/settings'),
-          ),
-        ],
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(4),
-          child: StatusBar(),
-        ),
-      ),
-      body: Stack(
-        children: [
-          app.isLoading
-              ? const _LoadingSkeleton()
-              : RefreshIndicator(
-                  onRefresh: () => app.refreshNow(),
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      _Header(app: app, lastScan: lastScan),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Select Crop',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      GridView.count(
-                        crossAxisCount:
-                            MediaQuery.of(context).size.width < 600 ? 2 : 3,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        childAspectRatio: 1.2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        children: [
-                          CropCard(
-                            label: 'Rice',
-                            icon: Icons.grass,
-                            selected: app.selectedCrop == 'rice',
-                            onTap: () => app.setCrop('rice'),
-                          ),
-                          CropCard(
-                            label: 'Wheat',
-                            icon: Icons.agriculture,
-                            selected: app.selectedCrop == 'wheat',
-                            onTap: () => app.setCrop('wheat'),
-                          ),
-                          CropCard(
-                            label: 'Maize',
-                            icon: Icons.spa,
-                            selected: app.selectedCrop == 'maize',
-                            onTap: () => app.setCrop('maize'),
-                          ),
-                          CropCard(
-                            label: 'Potato',
-                            icon: Icons.local_florist,
-                            selected: app.selectedCrop == 'potato',
-                            onTap: () => app.setCrop('potato'),
-                          ),
-                          CropCard(
-                            label: 'Tomato',
-                            icon: Icons.eco,
-                            selected: app.selectedCrop == 'tomato',
-                            onTap: () => app.setCrop('tomato'),
-                          ),
-                          CropCard(
-                            label: 'Pepper',
-                            icon: Icons.park,
-                            selected: app.selectedCrop == 'pepper',
-                            onTap: () => app.setCrop('pepper'),
-                          ),
+      backgroundColor: const Color(0xFFF5FBF5),
+      body: app.isLoading
+          ? const _LoadingSkeleton()
+          : RefreshIndicator(
+              color: const Color(0xFF2E7D32),
+              backgroundColor: Colors.white,
+              onRefresh: () => app.refreshNow(),
+              child: CustomScrollView(
+                slivers: [
+                  _AgriAppBar(app: app),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _DroneStatusCard(app: app),
+                        const SizedBox(height: 16),
+                        _StatsRow(app: app),
+                        const SizedBox(height: 24),
+                        const _SectionHeader(title: 'Select Crop to Monitor'),
+                        const SizedBox(height: 12),
+                        _CropSelector(app: app),
+                        const SizedBox(height: 24),
+                        if (app.detections.isNotEmpty) ...[
+                          const _SectionHeader(title: 'Recent Detections'),
+                          const SizedBox(height: 12),
+                          ...app.detections.take(3).map((d) => _RecentDetectionTile(d: d)),
                         ],
-                      ),
-                    ],
-                  ),
-                ),
-          if (app.isCapturing)
-            Container(
-              color: Colors.black54,
-              child: const Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(color: Colors.emerald),
-                    SizedBox(height: 16),
-                    Text(
-                      'Scanning...',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      ]),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          const TelemetryHud(),
-        ],
-      ),
-      floatingActionButton: app.connectionState == DroneConnectionState.direct
-          ? FloatingActionButton.extended(
-              onPressed: app.isCapturing ? null : () => app.captureImage(context),
-              backgroundColor: Colors.emerald,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Capture'),
-            )
-          : null,
     );
   }
 }
 
-class _Header extends StatelessWidget {
+class _AgriAppBar extends StatelessWidget {
   final AppProvider app;
-  final DateTime? lastScan;
+  const _AgriAppBar({required this.app});
 
-  const _Header({required this.app, required this.lastScan});
+  @override
+  Widget build(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 130,
+      pinned: true,
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      shadowColor: const Color(0xFF2E7D32).withOpacity(0.08),
+      actions: [
+        IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E7D32).withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.settings_outlined, color: Color(0xFF2E7D32)),
+          ),
+          onPressed: () => Navigator.of(context).pushNamed('/settings'),
+        ),
+        const SizedBox(width: 8),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        titlePadding: const EdgeInsets.fromLTRB(20, 0, 0, 16),
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'AgriDrone',
+              style: TextStyle(
+                color: Color(0xFF1B3A1E),
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
+            ),
+            Text(
+              'Guardian',
+              style: TextStyle(
+                color: const Color(0xFF2E7D32).withOpacity(0.6),
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+        background: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              bottom: BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.1)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DroneStatusCard extends StatelessWidget {
+  final AppProvider app;
+  const _DroneStatusCard({required this.app});
 
   @override
   Widget build(BuildContext context) {
     final status = app.droneStatus;
     final connected = status?.connected == true;
     final flying = status?.flying == true;
+    final battery = status?.battery ?? 0;
 
+    Color statusColor = const Color(0xFFE53935);
     String statusText = 'Disconnected';
-    Color statusColor = Colors.red;
     if (connected && flying) {
-      statusText = 'Flying';
-      statusColor = Colors.orange;
+      statusColor = const Color(0xFFFF9800);
+      statusText = 'In Flight';
     } else if (connected) {
-      statusText = 'Connected';
-      statusColor = Colors.green;
+      statusColor = const Color(0xFF2E7D32);
+      statusText = 'Connected · Ready';
     }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              const Icon(Icons.air, size: 28),
-              const SizedBox(width: 8),
-              Text(
-                'Drone Status',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ]),
-            const SizedBox(height: 8),
-            Row(
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: statusColor.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: statusColor.withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52, height: 52,
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(Icons.air, color: statusColor, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    shape: BoxShape.circle,
-                  ),
+                const Text('Drone Status', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 12, letterSpacing: 0.3)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      width: 8, height: 8,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: statusColor.withOpacity(0.4), blurRadius: 4)],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(statusText, style: const TextStyle(color: Color(0xFF1B3A1E), fontSize: 15, fontWeight: FontWeight.w600)),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(statusText),
-                const Spacer(),
-                if (status != null) Text('Battery ${status.battery}%'),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              lastScan == null
-                  ? 'Last scan: unavailable'
-                  : 'Last scan: ${DateFormat.yMMMd().add_jm().format(lastScan!)}',
-              style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          if (connected)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text('Battery', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 11)),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      battery > 50 ? Icons.battery_full : battery > 20 ? Icons.battery_3_bar : Icons.battery_alert,
+                      color: battery > 50 ? const Color(0xFF2E7D32) : battery > 20 ? const Color(0xFFFF9800) : const Color(0xFFE53935),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text('$battery%', style: const TextStyle(color: Color(0xFF1B3A1E), fontWeight: FontWeight.w700, fontSize: 16)),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
+}
+
+class _StatsRow extends StatelessWidget {
+  final AppProvider app;
+  const _StatsRow({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    final lastScan = app.detections.isNotEmpty
+        ? DateTime.fromMillisecondsSinceEpoch(app.detections.first.timestamp)
+        : null;
+    final severeCount = app.detections.where((d) => d.severity.toLowerCase().contains('severe')).length;
+
+    return Row(
+      children: [
+        Expanded(child: _StatCard(icon: Icons.document_scanner, label: 'Total Scans', value: '${app.detections.length}', accent: const Color(0xFF2E7D32))),
+        const SizedBox(width: 12),
+        Expanded(child: _StatCard(icon: Icons.warning_amber_rounded, label: 'Severe Cases', value: '$severeCount', accent: severeCount > 0 ? const Color(0xFFE53935) : const Color(0xFF2E7D32))),
+        const SizedBox(width: 12),
+        Expanded(child: _StatCard(icon: Icons.schedule, label: 'Last Scan', value: lastScan == null ? 'None' : DateFormat.MMMd().format(lastScan), accent: const Color(0xFF388E3C))),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accent;
+  const _StatCard({required this.icon, required this.label, required this.value, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accent.withOpacity(0.15)),
+        boxShadow: [BoxShadow(color: accent.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 3))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: accent, size: 22),
+          const SizedBox(height: 8),
+          Text(value, style: TextStyle(color: accent, fontSize: 20, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 11)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(width: 3, height: 16, decoration: BoxDecoration(color: const Color(0xFF2E7D32), borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 8),
+        Text(title, style: const TextStyle(color: Color(0xFF1B3A1E), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 0.2)),
+      ],
+    );
+  }
+}
+
+class _CropSelector extends StatelessWidget {
+  final AppProvider app;
+  const _CropSelector({required this.app});
+
+  static const _crops = [
+    {'label': 'Rice', 'emoji': '🌾', 'key': 'rice'},
+    {'label': 'Wheat', 'emoji': '🌿', 'key': 'wheat'},
+    {'label': 'Maize', 'emoji': '🌽', 'key': 'maize'},
+    {'label': 'Potato', 'emoji': '🥔', 'key': 'potato'},
+    {'label': 'Tomato', 'emoji': '🍅', 'key': 'tomato'},
+    {'label': 'Pepper', 'emoji': '🫑', 'key': 'pepper'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: MediaQuery.of(context).size.width < 600 ? 3 : 6,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 1.0,
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
+      children: _crops.map((c) {
+        final selected = app.selectedCrop == c['key'];
+        return GestureDetector(
+          onTap: () => app.setCrop(c['key']!),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFF2E7D32).withOpacity(0.08) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: selected ? const Color(0xFF2E7D32) : const Color(0xFF2E7D32).withOpacity(0.15),
+                width: selected ? 1.5 : 1,
+              ),
+              boxShadow: selected ? [BoxShadow(color: const Color(0xFF2E7D32).withOpacity(0.15), blurRadius: 12)] : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(c['emoji']!, style: const TextStyle(fontSize: 28)),
+                const SizedBox(height: 6),
+                Text(
+                  c['label']!,
+                  style: TextStyle(
+                    color: selected ? const Color(0xFF2E7D32) : const Color(0xFF6B7C6E),
+                    fontSize: 12,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class _RecentDetectionTile extends StatelessWidget {
+  final DetectionModel d;
+  const _RecentDetectionTile({required this.d});
+
+  Color _severityColor(String s) {
+    if (s.contains('severe')) return const Color(0xFFE53935);
+    if (s.contains('moderate')) return const Color(0xFFFF9800);
+    return const Color(0xFF2E7D32);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _severityColor(d.severity.toLowerCase());
+    final time = DateFormat.MMMd().add_jm().format(DateTime.fromMillisecondsSinceEpoch(d.timestamp));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            child: Icon(Icons.coronavirus_outlined, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('${_tc(d.crop)} · ${d.disease}', style: const TextStyle(color: Color(0xFF1B3A1E), fontWeight: FontWeight.w600, fontSize: 13)),
+                const SizedBox(height: 2),
+                Text(time, style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 11)),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(color: color.withOpacity(0.10), borderRadius: BorderRadius.circular(20)),
+            child: Text('${(d.confidence * 100).toInt()}%', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _tc(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
 class _LoadingSkeleton extends StatelessWidget {
@@ -208,18 +398,17 @@ class _LoadingSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return Padding(
       padding: const EdgeInsets.all(16),
-      children: List.generate(
-        6,
-        (i) => Container(
-          height: 90,
+      child: Column(
+        children: List.generate(5, (i) => Container(
+          height: i == 0 ? 80 : 60,
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: const Color(0xFFE8F5E9),
             borderRadius: BorderRadius.circular(16),
           ),
-        ),
+        )),
       ),
     );
   }

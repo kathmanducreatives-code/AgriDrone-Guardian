@@ -30,21 +30,47 @@ class AgriDroneApp extends StatelessWidget {
         title: 'AgriDrone Guardian',
         theme: ThemeData(
           useMaterial3: true,
+          brightness: Brightness.light,
           colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.light,
             seedColor: const Color(0xFF2E7D32),
             primary: const Color(0xFF2E7D32),
-            secondary: const Color(0xFF81C784),
-            surface: const Color(0xFFF1F8E9),
+            secondary: const Color(0xFF4CAF50),
+            surface: Colors.white,
           ),
-          scaffoldBackgroundColor: const Color(0xFFF1F8E9),
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          scaffoldBackgroundColor: const Color(0xFFF5FBF5),
+          textTheme: GoogleFonts.poppinsTextTheme().apply(
+            bodyColor: const Color(0xFF1B3A1E),
+            displayColor: const Color(0xFF1B3A1E),
+          ),
+          navigationBarTheme: NavigationBarThemeData(
+            backgroundColor: Colors.white,
+            indicatorColor: const Color(0xFF2E7D32).withOpacity(0.15),
+            labelTextStyle: MaterialStateProperty.all(
+              const TextStyle(color: Color(0xFF2E7D32), fontSize: 11, fontWeight: FontWeight.w500),
+            ),
+          ),
+          navigationRailTheme: NavigationRailThemeData(
+            backgroundColor: Colors.white,
+            indicatorColor: const Color(0xFF2E7D32).withOpacity(0.1),
+            selectedIconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
+            unselectedIconTheme: const IconThemeData(color: Color(0xFF9E9E9E)),
+            selectedLabelTextStyle: const TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.w600),
+            unselectedLabelTextStyle: const TextStyle(color: Color(0xFF9E9E9E)),
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Color(0xFF1B3A1E),
+            elevation: 0,
+            surfaceTintColor: Colors.transparent,
+          ),
           cardTheme: CardThemeData(
             color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: const Color(0xFF81C784).withOpacity(0.4)),
+              side: BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.12)),
             ),
-            elevation: 2,
+            elevation: 0,
           ),
         ),
         home: const AppShell(),
@@ -84,9 +110,17 @@ class _AppShellState extends State<AppShell> {
             NavigationRail(
               selectedIndex: index,
               onDestinationSelected: (i) => setState(() => index = i),
-              backgroundColor: Colors.white,
-              indicatorColor: const Color(0xFF81C784).withOpacity(0.3),
               labelType: NavigationRailLabelType.all,
+              leading: Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    const Icon(Icons.radar, color: Color(0xFF2E7D32), size: 28),
+                    const SizedBox(height: 2),
+                    const Text('AG', style: TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1)),
+                  ],
+                ),
+              ),
               destinations: const [
                 NavigationRailDestination(
                   icon: Icon(Icons.home_outlined),
