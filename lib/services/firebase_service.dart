@@ -17,12 +17,16 @@ class DroneStatus {
   final bool flying;
   final int battery;
   final int lastSeen;
+  final bool isActive;
+  final String? latestImageUrl;
 
   DroneStatus({
     required this.connected,
     required this.flying,
     required this.battery,
     required this.lastSeen,
+    required this.isActive,
+    this.latestImageUrl,
   });
 
   factory DroneStatus.fromMap(Map data) {
@@ -31,6 +35,8 @@ class DroneStatus {
       flying: data['flying'] == true,
       battery: (data['battery'] ?? 0) is int ? data['battery'] : 0,
       lastSeen: (data['lastSeen'] ?? 0) is int ? data['lastSeen'] : 0,
+      isActive: data['is_active'] == true,
+      latestImageUrl: data['latest_image_url']?.toString(),
     );
   }
 }
@@ -163,5 +169,22 @@ class FirebaseService {
     } catch (_) {
       return [];
     }
+  }
+
+  Future<void> updateMissionStatus(bool active) async {
+    if (_db == null) return;
+    try {
+      await _db!.ref('drone/status/is_active').set(active);
+    } catch (e) {
+      debugPrint('Error updating mission status: $e');
+    }
+  }
+
+  Stream<String> rawDroneStream() {
+    if (_db == null) return Stream.value('{}');
+    return _db!.ref('drone').onValue.map((event) {
+      final data = event.snapshot.value;
+      return jsonEncode(data);
+    });
   }
 }

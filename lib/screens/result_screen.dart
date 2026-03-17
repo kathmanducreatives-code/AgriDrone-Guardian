@@ -13,7 +13,7 @@ class ResultScreen extends StatelessWidget {
     final app = context.watch<AppProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FBF5),
+      backgroundColor: const Color(0xFFF5FFFA),
       body: app.isLoading
           ? const _LoadingSkeleton()
           : RefreshIndicator(
@@ -83,8 +83,8 @@ class _LatestCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.2)),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.07), blurRadius: 20, offset: const Offset(0, 6))],
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +94,7 @@ class _LatestCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2E7D32).withOpacity(0.08),
+                  color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text('LATEST', style: TextStyle(color: Color(0xFF2E7D32), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
@@ -102,7 +102,7 @@ class _LatestCard extends StatelessWidget {
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                 child: Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
               ),
             ],
@@ -123,7 +123,7 @@ class _LatestCard extends StatelessWidget {
                       value: detection.confidence,
                       strokeWidth: 6,
                       color: color,
-                      backgroundColor: color.withOpacity(0.1),
+                      backgroundColor: color.withValues(alpha: 0.1),
                     ),
                     Text('$confidence%', style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 15)),
                   ],
@@ -141,7 +141,7 @@ class _LatestCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: detection.confidence,
                         color: color,
-                        backgroundColor: color.withOpacity(0.1),
+                        backgroundColor: color.withValues(alpha: 0.1),
                         minHeight: 7,
                       ),
                     ),
@@ -178,8 +178,8 @@ class _SummaryBarChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.12)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 3))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 3))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,7 +205,7 @@ class _SummaryBarChart extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: fraction,
                       color: const Color(0xFF4CAF50),
-                      backgroundColor: const Color(0xFF4CAF50).withOpacity(0.1),
+                      backgroundColor: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                       minHeight: 5,
                     ),
                   ),
@@ -256,14 +256,14 @@ class _DetectionTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.1)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [
           Container(
             width: 44, height: 44,
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
             child: Icon(Icons.biotech_outlined, color: color, size: 22),
           ),
           const SizedBox(width: 12),
@@ -288,7 +288,7 @@ class _DetectionTile extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                 child: Text(_tc(d.severity), style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700)),
               ),
               const SizedBox(height: 4),
@@ -312,7 +312,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.science_outlined, size: 64, color: const Color(0xFF2E7D32).withOpacity(0.2)),
+            Icon(Icons.science_outlined, size: 64, color: const Color(0xFF2E7D32).withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             const Text('No detections yet', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 16)),
             const SizedBox(height: 6),
@@ -336,7 +336,7 @@ class _MessageBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFFFF8E1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFF9800).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

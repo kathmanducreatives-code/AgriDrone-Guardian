@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FBF5),
+      backgroundColor: const Color(0xFFF5FFFA),
       body: app.isLoading
           ? const _LoadingSkeleton()
           : Stack(
@@ -27,12 +27,16 @@ class HomeScreen extends StatelessWidget {
                   child: CustomScrollView(
                     slivers: [
                       _AgriAppBar(app: app),
-                      SliverToBoxAdapter(child: const StatusBar()),
                       SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                         sliver: SliverList(
                           delegate: SliverChildListDelegate([
+                            _ConnectivityCardsRow(app: app),
                             const SizedBox(height: 16),
+                            _LiveImageFeed(app: app),
+                            const SizedBox(height: 16),
+                            _MissionControl(app: app),
+                            const SizedBox(height: 24),
                             _DroneStatusCard(app: app),
                             const SizedBox(height: 16),
                             _StatsRow(app: app),
@@ -52,7 +56,6 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const TelemetryHud(),
                 if (app.isScanning) const _ScanningOverlay(),
               ],
             ),
@@ -61,7 +64,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: app.isScanning ? null : () => app.triggerCapture(),
               backgroundColor: const Color(0xFF2E7D32),
               icon: const Icon(Icons.camera_alt, color: Colors.white),
-              label: const Text('Capture', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              label: const Text('Capture', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
             )
           : null,
     );
@@ -74,7 +77,7 @@ class _ScanningOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withValues(alpha: 0.7),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -101,7 +104,7 @@ class _ScanningOverlay extends StatelessWidget {
             Text(
               'Analyzing crop health via ESP32-CAM',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 12,
               ),
             ),
@@ -124,13 +127,24 @@ class _AgriAppBar extends StatelessWidget {
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      shadowColor: const Color(0xFF2E7D32).withOpacity(0.08),
+      shadowColor: const Color(0xFF2E7D32).withValues(alpha: 0.08),
       actions: [
         IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF2E7D32).withOpacity(0.08),
+              color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.terminal, color: Color(0xFF2E7D32)),
+          ),
+          onPressed: () => Navigator.of(context).pushNamed('/developer'),
+        ),
+        IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E7D32).withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Icons.settings_outlined, color: Color(0xFF2E7D32)),
@@ -157,7 +171,7 @@ class _AgriAppBar extends StatelessWidget {
             Text(
               'Guardian',
               style: TextStyle(
-                color: const Color(0xFF2E7D32).withOpacity(0.6),
+                color: const Color(0xFF2E7D32).withValues(alpha: 0.6),
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
                 letterSpacing: 2,
@@ -169,11 +183,187 @@ class _AgriAppBar extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
-              bottom: BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.1)),
+              bottom: BorderSide(color: const Color(0xFF2E7D32).withValues(alpha: 0.1)),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ConnectivityCardsRow extends StatelessWidget {
+  final AppProvider app;
+  const _ConnectivityCardsRow({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = app.connectionState;
+    Color connColor = Colors.grey;
+    String connLabel = 'Offline';
+    if (state == DroneConnectionState.direct) {
+      connColor = Colors.emerald;
+      connLabel = 'Direct';
+    } else if (state == DroneConnectionState.cloud) {
+      connColor = Colors.blue;
+      connLabel = 'Cloud';
+    }
+
+    return Row(
+      children: [
+        Expanded(child: _SmallConnCard(icon: Icons.wifi, label: connLabel, value: state == DroneConnectionState.direct ? '${app.currentRssi} dBm' : 'N/A', color: connColor)),
+        const SizedBox(width: 8),
+        Expanded(child: _SmallConnCard(icon: Icons.timer_outlined, label: 'Latency', value: '${app.currentLatency.inMilliseconds}ms', color: _getLatencyColor(app.currentLatency))),
+        const SizedBox(width: 8),
+        Expanded(child: _SmallConnCard(icon: Icons.dns_outlined, label: 'Drone IP', value: '192.168.1.76', color: const Color(0xFF2E7D32))),
+      ],
+    );
+  }
+
+  Color _getLatencyColor(Duration latency) {
+    if (latency == Duration.zero) return Colors.grey;
+    if (latency.inMilliseconds < 50) return Colors.emerald;
+    if (latency.inMilliseconds < 150) return Colors.orange;
+    return Colors.red;
+  }
+}
+
+class _SmallConnCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  const _SmallConnCard({required this.icon, required this.label, required this.value, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 9, fontWeight: FontWeight.w500)),
+          Text(value, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace')),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiveImageFeed extends StatelessWidget {
+  final AppProvider app;
+  const _LiveImageFeed({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    final status = app.droneStatus;
+    final imageUrl = status?.latestImageUrl;
+    final isActive = status?.isActive == true;
+
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: isActive && imageUrl != null
+            ? Image.network(imageUrl, fit: BoxFit.cover, loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(child: CircularProgressIndicator(color: Color(0xFF2E7D32)));
+              }, errorBuilder: (context, error, stackTrace) {
+                return const _PlaceholderFeed(message: 'Signal Lost. Reconnecting...');
+              })
+            : const _PlaceholderFeed(message: 'Awaiting Live Stream from ESP32...'),
+      ),
+    );
+  }
+}
+
+class _PlaceholderFeed extends StatefulWidget {
+  final String message;
+  const _PlaceholderFeed({required this.message});
+
+  @override
+  State<_PlaceholderFeed> createState() => _PlaceholderFeedState();
+}
+
+class _PlaceholderFeedState extends State<_PlaceholderFeed> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FadeTransition(
+            opacity: Tween<double>(begin: 0.3, end: 1.0).animate(_controller),
+            child: const Icon(Icons.videocam_off_outlined, color: Color(0xFF4CAF50), size: 48),
+          ),
+          const SizedBox(height: 12),
+          Text(widget.message, style: TextStyle(color: const Color(0xFF2E7D32).withValues(alpha: 0.6), fontSize: 13)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MissionControl extends StatelessWidget {
+  final AppProvider app;
+  const _MissionControl({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = app.droneStatus?.isActive ?? false;
+    return Column(
+      children: [
+        if (app.errorMessage != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+            child: Text(app.errorMessage!, style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold)),
+          ),
+        SizedBox(
+          width: double.infinity,
+          height: 54,
+          child: ElevatedButton(
+            onPressed: () => app.triggerMission(!isActive),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isActive ? Colors.redAccent : const Color(0xFF2E7D32),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 0,
+            ),
+            child: Text(
+              isActive ? 'STOP MISSION' : 'START MISSION',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -204,10 +394,10 @@ class _DroneStatusCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: statusColor.withOpacity(0.2)),
+        border: Border.all(color: statusColor.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: statusColor.withOpacity(0.06),
+            color: statusColor.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -218,7 +408,7 @@ class _DroneStatusCard extends StatelessWidget {
           Container(
             width: 52, height: 52,
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(Icons.air, color: statusColor, size: 28),
@@ -237,7 +427,7 @@ class _DroneStatusCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: statusColor,
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: statusColor.withOpacity(0.4), blurRadius: 4)],
+                        boxShadow: [BoxShadow(color: statusColor.withValues(alpha: 0.4), blurRadius: 4)],
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -309,8 +499,8 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: accent.withOpacity(0.15)),
-        boxShadow: [BoxShadow(color: accent.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 3))],
+        border: Border.all(color: accent.withValues(alpha: 0.15)),
+        boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 3))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,25 +557,25 @@ class _CropSelector extends StatelessWidget {
       children: _crops.map((c) {
         final selected = app.selectedCrop == c['key'];
         return GestureDetector(
-          onTap: () => app.setCrop(c['key']!),
+          onTap: () => app.setCrop(c['key'] as String),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              color: selected ? const Color(0xFF2E7D32).withOpacity(0.08) : Colors.white,
+              color: selected ? const Color(0xFF2E7D32).withValues(alpha: 0.08) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: selected ? const Color(0xFF2E7D32) : const Color(0xFF2E7D32).withOpacity(0.15),
+                color: selected ? const Color(0xFF2E7D32) : const Color(0xFF2E7D32).withValues(alpha: 0.15),
                 width: selected ? 1.5 : 1,
               ),
-              boxShadow: selected ? [BoxShadow(color: const Color(0xFF2E7D32).withOpacity(0.15), blurRadius: 12)] : null,
+              boxShadow: selected ? [BoxShadow(color: const Color(0xFF2E7D32).withValues(alpha: 0.15), blurRadius: 12)] : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(c['emoji']!, style: const TextStyle(fontSize: 28)),
+                Text(c['emoji'] as String, style: const TextStyle(fontSize: 28)),
                 const SizedBox(height: 6),
                 Text(
-                  c['label']!,
+                  c['label'] as String,
                   style: TextStyle(
                     color: selected ? const Color(0xFF2E7D32) : const Color(0xFF6B7C6E),
                     fontSize: 12,
@@ -422,14 +612,14 @@ class _RecentDetectionTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.1)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [
           Container(
             width: 40, height: 40,
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
             child: Icon(Icons.coronavirus_outlined, color: color, size: 20),
           ),
           const SizedBox(width: 12),
@@ -445,7 +635,7 @@ class _RecentDetectionTile extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(color: color.withOpacity(0.10), borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(20)),
             child: Text('${(d.confidence * 100).toInt()}%', style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 12)),
           ),
         ],

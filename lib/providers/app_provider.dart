@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 import '../services/firebase_service.dart';
 import '../services/connectivity_service.dart';
 import '../models/detection_model.dart';
@@ -99,6 +100,36 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> triggerMission(bool start) async {
+    if (start) {
+      errorMessage = "Waking AI...";
+      notifyListeners();
+      
+      try {
+        // Send wake-up call to Render API
+        final response = await http.get(Uri.parse('https://agridrone-api.onrender.com/')).timeout(const Duration(seconds: 10));
+        if (response.statusCode == 200) {
+          errorMessage = "AI Online. Starting mission...";
+          notifyListeners();
+          await _firebase.updateMissionStatus(true);
+        } else {
+          errorMessage = "Render API wake-up failed. Check server.";
+          notifyListeners();
+        }
+      } catch (e) {
+        errorMessage = "Error connecting to AI server: $e";
+        notifyListeners();
+      }
+      
+      Future.delayed(const Duration(seconds: 3), () {
+        errorMessage = null;
+        notifyListeners();
+      });
+    } else {
+      await _firebase.updateMissionStatus(false);
+    }
+  }
+
   Future<void> triggerCapture() async {
     if (connectionState != DroneConnectionState.direct) return;
     
@@ -121,6 +152,8 @@ class AppProvider extends ChangeNotifier {
     isScanning = false;
     notifyListeners();
   }
+
+  Stream<String> get rawDroneStream => _firebase.rawDroneStream();
 
   @override
   void dispose() {

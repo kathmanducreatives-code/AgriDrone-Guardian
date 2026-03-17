@@ -24,8 +24,8 @@ class TelemetryHud extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.4),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                  color: Colors.black.withValues(alpha: 0.4),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(

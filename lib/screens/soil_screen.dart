@@ -15,7 +15,7 @@ class SoilScreen extends StatelessWidget {
     final latest = app.soil.isNotEmpty ? app.soil.last : null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FBF5),
+      backgroundColor: const Color(0xFFF5FFFA),
       body: app.isLoading
           ? const _LoadingSkeleton()
           : CustomScrollView(
@@ -81,8 +81,8 @@ class _MoistureGaugeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.2)),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.07), blurRadius: 20, offset: const Offset(0, 6))],
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, 6))],
       ),
       child: Column(
         children: [
@@ -90,7 +90,7 @@ class _MoistureGaugeCard extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                 child: Text(status, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
               ),
               const Spacer(),
@@ -107,7 +107,7 @@ class _MoistureGaugeCard extends StatelessWidget {
                   value: moisture / 100,
                   strokeWidth: 10,
                   color: color,
-                  backgroundColor: color.withOpacity(0.1),
+                  backgroundColor: color.withValues(alpha: 0.1),
                 ),
                 Column(
                   mainAxisSize: MainAxisSize.min,
@@ -125,7 +125,7 @@ class _MoistureGaugeCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.06),
+              color: color.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -152,7 +152,7 @@ class _SoilReadingsChart extends StatelessWidget {
     if (data.isEmpty) {
       return Container(
         height: 200,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.12))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12))),
         child: const Center(child: Text('No data', style: TextStyle(color: Color(0xFF9E9E9E)))),
       );
     }
@@ -166,8 +166,8 @@ class _SoilReadingsChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.12)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 3))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 3))],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -185,7 +185,7 @@ class _SoilReadingsChart extends StatelessWidget {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) => FlLine(color: const Color(0xFF2E7D32).withOpacity(0.07), strokeWidth: 1),
+                    getDrawingHorizontalLine: (_) => FlLine(color: const Color(0xFF2E7D32).withValues(alpha: 0.07), strokeWidth: 1),
                   ),
                   borderData: FlBorderData(show: false),
                   titlesData: FlTitlesData(
@@ -226,7 +226,7 @@ class _SoilReadingsChart extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
-                          colors: [const Color(0xFF4CAF50).withOpacity(0.2), const Color(0xFF4CAF50).withOpacity(0.0)],
+                          colors: [const Color(0xFF4CAF50).withValues(alpha: 0.2), const Color(0xFF4CAF50).withValues(alpha: 0.0)],
                         ),
                       ),
                     ),
@@ -252,8 +252,8 @@ class _ReadingsTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.12)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 3))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 3))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +278,7 @@ class _ReadingsTable extends StatelessWidget {
                 children: [
                   Container(
                     width: 36, height: 36,
-                    decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: color.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
                     child: Icon(Icons.water_drop_outlined, color: color, size: 16),
                   ),
                   const SizedBox(width: 12),

@@ -30,7 +30,7 @@ class CropCard extends StatelessWidget {
               border: Border.all(
                 color: selected
                     ? const Color(0xFF2E7D32)
-                    : const Color(0xFF81C784).withOpacity(0.4),
+                    : const Color(0xFF81C784).withValues(alpha: 0.4),
                 width: selected ? 2 : 1,
               ),
             ),

@@ -9,6 +9,7 @@ import 'screens/home_screen.dart';
 import 'screens/result_screen.dart';
 import 'screens/soil_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/developer_screen.dart';
 import 'widgets/status_bar.dart';
 
 void main() async {
@@ -39,21 +40,21 @@ class AgriDroneApp extends StatelessWidget {
             secondary: const Color(0xFF4CAF50),
             surface: Colors.white,
           ),
-          scaffoldBackgroundColor: const Color(0xFFF5FBF5),
+          scaffoldBackgroundColor: const Color(0xFFF5FFFA),
           textTheme: GoogleFonts.poppinsTextTheme().apply(
             bodyColor: const Color(0xFF1B3A1E),
             displayColor: const Color(0xFF1B3A1E),
           ),
           navigationBarTheme: NavigationBarThemeData(
             backgroundColor: Colors.white,
-            indicatorColor: const Color(0xFF2E7D32).withOpacity(0.15),
+            indicatorColor: const Color(0xFF2E7D32).withValues(alpha: 0.15),
             labelTextStyle: MaterialStateProperty.all(
               const TextStyle(color: Color(0xFF2E7D32), fontSize: 11, fontWeight: FontWeight.w500),
             ),
           ),
           navigationRailTheme: NavigationRailThemeData(
             backgroundColor: Colors.white,
-            indicatorColor: const Color(0xFF2E7D32).withOpacity(0.1),
+            indicatorColor: const Color(0xFF2E7D32).withValues(alpha: 0.1),
             selectedIconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
             unselectedIconTheme: const IconThemeData(color: Color(0xFF9E9E9E)),
             selectedLabelTextStyle: const TextStyle(color: Color(0xFF2E7D32), fontWeight: FontWeight.w600),
@@ -69,7 +70,7 @@ class AgriDroneApp extends StatelessWidget {
             color: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.12)),
+              side: BorderSide(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
             ),
             elevation: 0,
           ),
@@ -77,6 +78,7 @@ class AgriDroneApp extends StatelessWidget {
         home: const AppShell(),
         routes: {
           SettingsScreen.route: (_) => const SettingsScreen(),
+          DeveloperScreen.route: (_) => const DeveloperScreen(),
         },
       ),
     );

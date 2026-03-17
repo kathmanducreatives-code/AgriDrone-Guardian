@@ -21,7 +21,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final app = context.watch<AppProvider>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FBF5),
+      backgroundColor: const Color(0xFFF5FFFA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
@@ -39,10 +39,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withOpacity(0.25),
+                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.25),
               ),
               boxShadow: [BoxShadow(
-                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withOpacity(0.07),
+                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.07),
                 blurRadius: 16, offset: const Offset(0, 4),
               )],
             ),
@@ -51,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   width: 44, height: 44,
                   decoration: BoxDecoration(
-                    color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withOpacity(0.1),
+                    color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -142,12 +142,12 @@ class _StyledTextField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Color(0xFF9E9E9E)),
-        prefixIcon: Icon(icon, color: const Color(0xFF2E7D32).withOpacity(0.6), size: 20),
+        prefixIcon: Icon(icon, color: const Color(0xFF2E7D32).withValues(alpha: 0.6), size: 20),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: const Color(0xFF2E7D32).withOpacity(0.15)),
+          borderSide: BorderSide(color: const Color(0xFF2E7D32).withValues(alpha: 0.15)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -173,14 +173,14 @@ class _ToggleTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.12)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))],
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [
           Container(
             width: 40, height: 40,
-            decoration: BoxDecoration(color: const Color(0xFF2E7D32).withOpacity(0.08), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
             child: Icon(icon, color: const Color(0xFF2E7D32), size: 20),
           ),
           const SizedBox(width: 12),
@@ -198,8 +198,8 @@ class _ToggleTile extends StatelessWidget {
             onChanged: onChanged,
             activeColor: const Color(0xFF2E7D32),
             trackColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.selected)) return const Color(0xFF2E7D32).withOpacity(0.25);
-              return Colors.grey.withOpacity(0.2);
+              if (states.contains(MaterialState.selected)) return const Color(0xFF2E7D32).withValues(alpha: 0.25);
+              return Colors.grey.withValues(alpha: 0.2);
             }),
           ),
         ],
@@ -222,11 +222,11 @@ class _InfoTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.1)),
+        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF2E7D32).withOpacity(0.5), size: 18),
+          Icon(icon, color: const Color(0xFF2E7D32).withValues(alpha: 0.5), size: 18),
           const SizedBox(width: 12),
           Expanded(child: Text(title, style: const TextStyle(color: Color(0xFF6B7C6E), fontSize: 13))),
           Text(subtitle, style: const TextStyle(color: Color(0xFF1B3A1E), fontSize: 13, fontWeight: FontWeight.w500)),
