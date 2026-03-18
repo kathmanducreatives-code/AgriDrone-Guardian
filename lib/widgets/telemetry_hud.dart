@@ -48,7 +48,7 @@ class TelemetryHud extends StatelessWidget {
                     _buildHudItem(
                       icon: Icons.dns_outlined,
                       label: 'IP ADDR',
-                      value: '192.168.1.76',
+                      value: provider.esp32Ip,
                       color: Colors.white70,
                     ),
                   ],

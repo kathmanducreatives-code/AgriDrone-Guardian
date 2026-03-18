@@ -9,7 +9,9 @@ enum DroneConnectionState {
 }
 
 class ConnectivityService {
-  final String droneIp = '192.168.1.76';
+  static const String defaultDroneIp = '192.168.1.76';
+
+  String _droneIp = defaultDroneIp;
   final Duration pingInterval = const Duration(seconds: 10);
   
   final _connectionStateController = StreamController<DroneConnectionState>.broadcast();
@@ -21,6 +23,12 @@ class ConnectivityService {
   Timer? _pingTimer;
   DroneConnectionState _currentState = DroneConnectionState.offline;
   bool _firebaseConnected = false;
+
+  String get droneIp => _droneIp;
+
+  void updateDroneIp(String value) {
+    _droneIp = value.trim().isEmpty ? defaultDroneIp : value.trim();
+  }
 
   void startPinging() {
     _pingTimer?.cancel();
@@ -40,7 +48,7 @@ class ConnectivityService {
   Future<void> _checkDirectConnection() async {
     final stopwatch = Stopwatch()..start();
     try {
-      final response = await http.get(Uri.parse('http://$droneIp/')).timeout(const Duration(seconds: 3));
+      final response = await http.get(Uri.parse('http://$_droneIp/')).timeout(const Duration(seconds: 3));
       stopwatch.stop();
       if (response.statusCode == 200) {
         _latencyController.add(stopwatch.elapsed);
@@ -70,7 +78,7 @@ class ConnectivityService {
 
   Future<bool> triggerCapture() async {
     try {
-      final response = await http.get(Uri.parse('http://$droneIp/capture')).timeout(const Duration(seconds: 15));
+      final response = await http.get(Uri.parse('http://$_droneIp/capture')).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (e) {
       debugPrint('Local capture failed: $e');
@@ -80,7 +88,7 @@ class ConnectivityService {
 
   Future<String> forceStartDirect() async {
     try {
-      final response = await http.get(Uri.parse('http://$droneIp/START')).timeout(const Duration(seconds: 10));
+      final response = await http.get(Uri.parse('http://$_droneIp/START')).timeout(const Duration(seconds: 10));
       return 'Status: ${response.statusCode} - ${response.body}';
     } on TimeoutException {
       return 'Connection Failed: Timeout (10s) - Ensure you are on the drone\'s WiFi network.';

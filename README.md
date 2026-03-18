@@ -1,17 +1,32 @@
-# agridrone_guardian
+# AgriDrone Guardian
 
-A new Flutter project.
+Flutter control panel for AgriDrone mission control, Firebase telemetry, and backend/ESP32 developer tooling.
 
-## Getting Started
+## Developer Tools
 
-This project is a starting point for a Flutter application.
+The app now includes a dedicated Developer Tools section with:
+- ESP32 local controls using a persisted configurable IP address
+- Backend multipart upload testing against `/predict_form`
+- Latest backend debug image viewer for `/debug/latest.jpg`
+- Firebase status and diagnostics panels
 
-A few resources to get you started if this is your first Flutter project:
+## Deployment Safety
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Vercel routing is kept stable by:
+- keeping `vercel.json` in the project root
+- copying `vercel.json` into `build/web/vercel.json` during web builds
+- deploying `build/web` instead of the repository root
+- using a rewrite that sends all routes to `index.html`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Local Run
+
+```bash
+flutter pub get
+flutter run -d macos
+```
+
+## Web Build
+
+```bash
+./build_web.sh
+```

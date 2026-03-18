@@ -141,12 +141,11 @@ class _AppShellState extends State<AppShell> {
                   selectedIcon: Icon(Icons.water_drop),
                   label: Text('Soil'),
                 ),
-                if (context.watch<AppProvider>().isDevMode)
-                  const NavigationRailDestination(
-                    icon: Icon(Icons.bug_report_outlined),
-                    selectedIcon: Icon(Icons.bug_report),
-                    label: Text('Dev'),
-                  ),
+                const NavigationRailDestination(
+                  icon: Icon(Icons.build_circle_outlined),
+                  selectedIcon: Icon(Icons.build_circle),
+                  label: Text('Dev Tools'),
+                ),
               ],
             ),
           Expanded(
@@ -170,9 +169,8 @@ class _AppShellState extends State<AppShell> {
                     icon: Icon(Icons.analytics), label: 'Results'),
                 const NavigationDestination(
                     icon: Icon(Icons.water_drop), label: 'Soil'),
-                if (context.watch<AppProvider>().isDevMode)
-                  const NavigationDestination(
-                    icon: Icon(Icons.bug_report), label: 'Developer'),
+                const NavigationDestination(
+                  icon: Icon(Icons.build_circle), label: 'Dev Tools'),
               ],
             ),
     );

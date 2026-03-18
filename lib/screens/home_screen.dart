@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 
 import '../providers/app_provider.dart';
 import '../models/detection_model.dart';
-import '../widgets/telemetry_hud.dart';
-import '../widgets/status_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -59,14 +57,6 @@ class HomeScreen extends StatelessWidget {
                 if (app.isScanning) const _ScanningOverlay(),
               ],
             ),
-      floatingActionButton: app.connectionState == DroneConnectionState.direct
-          ? FloatingActionButton.extended(
-              onPressed: app.isScanning ? null : () => app.triggerCapture(),
-              backgroundColor: const Color(0xFF2E7D32),
-              icon: const Icon(Icons.camera_alt, color: Colors.white),
-              label: const Text('Capture', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-            )
-          : null,
     );
   }
 }
@@ -207,7 +197,7 @@ class _ConnectivityCardsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(child: _SmallConnCard(icon: Icons.timer_outlined, label: 'Latency', value: '${app.currentLatency.inMilliseconds}ms', color: _getLatencyColor(app.currentLatency))),
         const SizedBox(width: 8),
-        Expanded(child: _SmallConnCard(icon: Icons.dns_outlined, label: 'Drone IP', value: '192.168.1.76', color: const Color(0xFF2E7D32))),
+        Expanded(child: _SmallConnCard(icon: Icons.dns_outlined, label: 'Drone IP', value: app.esp32Ip, color: const Color(0xFF2E7D32))),
       ],
     );
   }

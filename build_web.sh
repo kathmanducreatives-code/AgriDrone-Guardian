@@ -16,7 +16,7 @@ flutter build web --release
 # 3. Inject Vercel configuration
 if [ -f "vercel.json" ]; then
     echo "📋 Copying vercel.json to build/web/..."
-    cp vercel.json build/web/
+    cp vercel.json build/web/vercel.json
 else
     echo "⚠️ Warning: vercel.json not found in root. Creating a default one in build/web/..."
     cat <<EOF > build/web/vercel.json
@@ -27,5 +27,8 @@ else
 }
 EOF
 fi
+
+test -f build/web/index.html
+test -d build/web/assets
 
 echo "✅ Build complete! Output is in build/web/"

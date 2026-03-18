@@ -35,22 +35,18 @@ class _StatusBarState extends State<StatusBar> with SingleTickerProviderStateMix
     return Consumer<AppProvider>(
       builder: (context, provider, _) {
         Color color;
-        String text;
         bool pulse = false;
 
         switch (provider.connectionState) {
           case DroneConnectionState.direct:
             color = Colors.teal;
-            text = 'DIRECT CONNECTION';
             pulse = true;
             break;
           case DroneConnectionState.cloud:
             color = Colors.blue;
-            text = 'CLOUD MONITORING';
             break;
           case DroneConnectionState.offline:
             color = Colors.grey;
-            text = 'OFFLINE';
             break;
         }
 

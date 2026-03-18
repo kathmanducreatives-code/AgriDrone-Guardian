@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/firebase_service.dart';
 import '../services/connectivity_service.dart';
 import '../models/detection_model.dart';
@@ -21,6 +22,7 @@ class AppProvider extends ChangeNotifier {
   bool firebaseConnected = false;
   bool isScanning = false;
   bool isDevMode = false;
+  String esp32Ip = ConnectivityService.defaultDroneIp;
 
   // Connectivity Suite State
   DroneConnectionState connectionState = DroneConnectionState.offline;
@@ -33,9 +35,11 @@ class AppProvider extends ChangeNotifier {
   StreamSubscription? _connSub;
   StreamSubscription? _latencySub;
   StreamSubscription? _configSub;
+  static const _esp32IpPreferenceKey = 'esp32_ip';
 
   Future<void> init() async {
     _setLoading(true);
+    await _loadLocalSettings();
     await _firebase.init();
     firebaseConnected = _firebase.firebaseReady;
 
@@ -87,6 +91,12 @@ class AppProvider extends ChangeNotifier {
     _setLoading(false);
   }
 
+  Future<void> _loadLocalSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    esp32Ip = prefs.getString(_esp32IpPreferenceKey) ?? ConnectivityService.defaultDroneIp;
+    _connectivity.updateDroneIp(esp32Ip);
+  }
+
   Future<void> fetchInitialData() async {
     final d = await _firebase.fetchDetectionsOnce();
     final s = await _firebase.fetchSoilOnce();
@@ -113,6 +123,15 @@ class AppProvider extends ChangeNotifier {
 
   Future<String> forceStartDirect() async {
     return await _connectivity.forceStartDirect();
+  }
+
+  Future<void> updateEsp32Ip(String value) async {
+    final trimmed = value.trim().isEmpty ? ConnectivityService.defaultDroneIp : value.trim();
+    esp32Ip = trimmed;
+    _connectivity.updateDroneIp(trimmed);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_esp32IpPreferenceKey, trimmed);
+    notifyListeners();
   }
 
   Future<void> refreshNow() async {

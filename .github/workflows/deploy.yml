@@ -20,8 +20,10 @@ jobs:
 
       - name: Build Web
         run: |
-          chmod +x build_web.sh
-          ./build_web.sh
+          flutter pub get
+          flutter build web --release
+          cp vercel.json build/web/vercel.json
+          test -f build/web/index.html
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
