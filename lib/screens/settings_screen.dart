@@ -1,237 +1,462 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../providers/app_providers.dart';
+import '../models/drone_models.dart';
+import '../widgets/glass_card.dart';
+import '../widgets/pulsing_dot.dart';
 
-import '../providers/app_provider.dart';
-
-class SettingsScreen extends StatefulWidget {
-  static const route = '/settings';
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  final farmController = TextEditingController(text: 'Green Valley Farm');
-  final locationController = TextEditingController(text: 'Nepal');
-  bool alertsEnabled = true;
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final _ipController =
+      TextEditingController(text: '192.168.1.76');
+
+  static const _crops = [
+    {'label': 'Rice', 'icon': Icons.grass},
+    {'label': 'Wheat', 'icon': Icons.landscape},
+    {'label': 'Maize', 'icon': Icons.eco},
+    {'label': 'Tomato', 'icon': Icons.circle},
+    {'label': 'Potato', 'icon': Icons.spa},
+  ];
+
+  @override
+  void dispose() {
+    _ipController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final app = context.watch<AppProvider>();
+    final configAsync = ref.watch(configProvider);
+    final statusAsync = ref.watch(droneStatusProvider);
+
+    final config = configAsync.value ?? AppConfig();
+    final isOnline = statusAsync.value?.status.toLowerCase() == 'online';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FFFA),
+      backgroundColor: const Color(0xFF0A0F0D),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
+        backgroundColor: const Color(0xFF0A0F0D),
         elevation: 0,
-        title: const Text('Settings', style: TextStyle(color: Color(0xFF1B3A1E), fontWeight: FontWeight.w700)),
-        iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
+        title: Text('Settings',
+            style: GoogleFonts.syne(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: const Color(0xFFE8F5E9))),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Firebase Status Banner
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.25),
-              ),
-              boxShadow: [BoxShadow(
-                color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.07),
-                blurRadius: 16, offset: const Offset(0, 4),
-              )],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44, height: 44,
-                  decoration: BoxDecoration(
-                    color: (app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935)).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Connection Status
+            _sectionLabel('CONNECTION'),
+            const SizedBox(height: 10),
+            GlassCard(
+              child: Column(
+                children: [
+                  _connectionRow(
+                    icon: Icons.cloud_queue_rounded,
+                    label: 'Firebase RTDB',
+                    status: isOnline ? 'CONNECTED' : 'DISCONNECTED',
+                    ok: isOnline,
+                    subtitle: 'agridrone-guardian.asia-southeast1',
                   ),
-                  child: Icon(
-                    app.firebaseConnected ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
-                    color: app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935),
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Firebase Status', style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 11, letterSpacing: 0.5)),
-                    const SizedBox(height: 2),
-                    Text(
-                      app.firebaseConnected ? 'Online · Realtime Sync Active' : 'Offline · Using Cached Data',
-                      style: TextStyle(
-                        color: app.firebaseConnected ? const Color(0xFF2E7D32) : const Color(0xFFE53935),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                  const SizedBox(height: 16),
+                  Divider(height: 1, color: Colors.white.withOpacity(0.06)),
+                  const SizedBox(height: 16),
+                  _connectionRow(
+                    icon: Icons.api_rounded,
+                    label: 'Inference API',
+                    status: 'RENDER',
+                    ok: true,
+                    subtitle: 'agridrone-api.onrender.com',
+                    trailingWidget: IconButton(
+                      icon: const Icon(Icons.copy_rounded, size: 16,
+                          color: Color(0xFF4A6B51)),
+                      onPressed: () {
+                        Clipboard.setData(const ClipboardData(
+                            text: 'https://agridrone-api.onrender.com'));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Copied!',
+                                style: GoogleFonts.instrumentSans()),
+                            backgroundColor: const Color(0xFF1A2A1E),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(height: 1, color: Colors.white.withOpacity(0.06)),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF38BDF8).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.router_rounded,
+                            color: Color(0xFF38BDF8), size: 18),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _ipController,
+                          style: GoogleFonts.dmMono(
+                              fontSize: 13,
+                              color: const Color(0xFFE8F5E9)),
+                          decoration: InputDecoration(
+                            labelText: 'Drone IP Address',
+                            labelStyle: GoogleFonts.instrumentSans(
+                                fontSize: 12,
+                                color: const Color(0xFF4A6B51)),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          // Update drone IP via Firebase
+                          updateConfig('ip', _ipController.text.trim());
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4ADE80).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: const Color(0xFF4ADE80).withOpacity(0.3)),
+                          ),
+                          child: Text('CONNECT',
+                              style: GoogleFonts.dmMono(
+                                  fontSize: 10,
+                                  letterSpacing: 1,
+                                  color: const Color(0xFF4ADE80))),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 28),
 
-          _SectionHeader(text: 'Farm Details'),
-          const SizedBox(height: 10),
-          _StyledTextField(controller: farmController, label: 'Farm Name', icon: Icons.home_work_outlined),
-          const SizedBox(height: 10),
-          _StyledTextField(controller: locationController, label: 'Location', icon: Icons.location_on_outlined),
-          const SizedBox(height: 20),
+            // Hardware Config
+            _sectionLabel('HARDWARE CONFIG'),
+            const SizedBox(height: 10),
+            GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('CROP TYPE',
+                      style: GoogleFonts.dmMono(
+                          fontSize: 10,
+                          letterSpacing: 2,
+                          color: const Color(0xFF4A6B51))),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _crops.map((c) {
+                        final label = c['label'] as String;
+                        final icon = c['icon'] as IconData;
+                        final selected = config.crop == label;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: GestureDetector(
+                            onTap: () => updateConfig('crop', label),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? const Color(0xFF4ADE80).withOpacity(0.12)
+                                    : Colors.white.withOpacity(0.04),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: selected
+                                      ? const Color(0xFF4ADE80).withOpacity(0.5)
+                                      : Colors.white.withOpacity(0.08),
+                                ),
+                              ),
+                              child: Row(children: [
+                                Icon(icon,
+                                    size: 15,
+                                    color: selected
+                                        ? const Color(0xFF4ADE80)
+                                        : const Color(0xFF4A6B51)),
+                                const SizedBox(width: 6),
+                                Text(label,
+                                    style: GoogleFonts.instrumentSans(
+                                        fontSize: 13,
+                                        fontWeight: selected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                        color: selected
+                                            ? const Color(0xFFE8F5E9)
+                                            : const Color(0xFF86A98E))),
+                              ]),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-          _SectionHeader(text: 'Notifications'),
-          const SizedBox(height: 10),
-          _ToggleTile(
-            icon: Icons.notifications_outlined,
-            title: 'Disease Alerts',
-            subtitle: 'Get notified when a new disease is detected',
-            value: alertsEnabled,
-            onChanged: (v) => setState(() => alertsEnabled = v),
-          ),
-          const SizedBox(height: 20),
+                  // Scan interval slider
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('SCAN INTERVAL',
+                          style: GoogleFonts.dmMono(
+                              fontSize: 10,
+                              letterSpacing: 2,
+                              color: const Color(0xFF4A6B51))),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4ADE80).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                        ),
+                        child: Text('${config.scanInterval}s',
+                            style: GoogleFonts.dmMono(
+                                fontSize: 13,
+                                color: const Color(0xFF4ADE80))),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: const Color(0xFF4ADE80),
+                      inactiveTrackColor:
+                          const Color(0xFF4ADE80).withOpacity(0.1),
+                      thumbColor: const Color(0xFF4ADE80),
+                      overlayColor:
+                          const Color(0xFF4ADE80).withOpacity(0.15),
+                      trackHeight: 3,
+                    ),
+                    child: Slider(
+                      value: config.scanInterval.toDouble().clamp(10, 300),
+                      min: 10,
+                      max: 300,
+                      divisions: 29,
+                      onChanged: (_) {},
+                      onChangeEnd: (v) =>
+                          updateConfig('scan_interval', v.toInt()),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-          _SectionHeader(text: 'About'),
-          const SizedBox(height: 10),
-          _InfoTile(icon: Icons.info_outline, title: 'App Version', subtitle: '1.0.0'),
-          _InfoTile(icon: Icons.flight_outlined, title: 'Project', subtitle: 'AgriDrone Guardian'),
-          _InfoTile(icon: Icons.cloud_outlined, title: 'Database', subtitle: 'Asia Southeast 1'),
-          _InfoTile(icon: Icons.security_outlined, title: 'Firebase Project', subtitle: 'agridrone-guardian'),
-          const SizedBox(height: 32),
-        ],
+                  // Confidence threshold slider
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('CONFIDENCE THRESHOLD',
+                          style: GoogleFonts.dmMono(
+                              fontSize: 10,
+                              letterSpacing: 2,
+                              color: const Color(0xFF4A6B51))),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4ADE80).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                        ),
+                        child: Text(
+                            '${(config.confidence * 100).toStringAsFixed(0)}%',
+                            style: GoogleFonts.dmMono(
+                                fontSize: 13,
+                                color: const Color(0xFF4ADE80))),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: const Color(0xFF4ADE80),
+                      inactiveTrackColor:
+                          const Color(0xFF4ADE80).withOpacity(0.1),
+                      thumbColor: const Color(0xFF4ADE80),
+                      overlayColor:
+                          const Color(0xFF4ADE80).withOpacity(0.15),
+                      trackHeight: 3,
+                    ),
+                    child: Slider(
+                      value: config.confidence.clamp(0.1, 0.9),
+                      min: 0.1,
+                      max: 0.9,
+                      divisions: 8,
+                      onChanged: (_) {},
+                      onChangeEnd: (v) => updateConfig('confidence', v),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 28),
+
+            // About
+            _sectionLabel('ABOUT'),
+            const SizedBox(height: 10),
+            GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4ADE80).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                        ),
+                        child: const Icon(Icons.hexagon_outlined,
+                            color: Color(0xFF4ADE80), size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('AgriDrone Guardian',
+                              style: GoogleFonts.syne(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFFE8F5E9))),
+                          Text('Version 2.0.0 · Build 2404A',
+                              style: GoogleFonts.dmMono(
+                                  fontSize: 11,
+                                  color: const Color(0xFF4A6B51))),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Divider(height: 1, color: Colors.white.withOpacity(0.06)),
+                  const SizedBox(height: 16),
+                  _aboutRow('Module', 'CC4003NI · Agricultural Tech'),
+                  _aboutRow('Institution', 'Islington College'),
+                  _aboutRow('Validated by', 'London Metropolitan University'),
+                  _aboutRow('Firebase Project', 'agridrone-guardian'),
+                  _aboutRow('Inference Engine',
+                      'YOLOv8 · FastAPI · Render.com'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _SectionHeader extends StatelessWidget {
-  final String text;
-  const _SectionHeader({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _connectionRow({
+    required IconData icon,
+    required String label,
+    required String status,
+    required bool ok,
+    required String subtitle,
+    Widget? trailingWidget,
+  }) {
+    final color = ok ? const Color(0xFF4ADE80) : const Color(0xFFF87171);
     return Row(
       children: [
-        Container(width: 3, height: 14, decoration: BoxDecoration(color: const Color(0xFF2E7D32), borderRadius: BorderRadius.circular(2))),
-        const SizedBox(width: 8),
-        Text(text, style: const TextStyle(color: Color(0xFF2E7D32), fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: GoogleFonts.instrumentSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFE8F5E9))),
+              Text(subtitle,
+                  style: GoogleFonts.dmMono(
+                      fontSize: 10, color: const Color(0xFF4A6B51))),
+            ],
+          ),
+        ),
+        if (trailingWidget != null) trailingWidget,
+        Row(
+          children: [
+            if (ok)
+              PulsingDot(color: color, size: 6)
+            else
+              Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                      color: color, shape: BoxShape.circle)),
+            const SizedBox(width: 6),
+            Text(status,
+                style: GoogleFonts.dmMono(
+                    fontSize: 10, letterSpacing: 1, color: color)),
+          ],
+        ),
       ],
     );
   }
-}
 
-class _StyledTextField extends StatelessWidget {
-  final TextEditingController controller;
-  final String label;
-  final IconData icon;
-  const _StyledTextField({required this.controller, required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Color(0xFF1B3A1E)),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF9E9E9E)),
-        prefixIcon: Icon(icon, color: const Color(0xFF2E7D32).withValues(alpha: 0.6), size: 20),
-        filled: true,
-        fillColor: Colors.white,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: const Color(0xFF2E7D32).withValues(alpha: 0.15)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 1.5),
-        ),
-      ),
-    );
-  }
-}
-
-class _ToggleTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  const _ToggleTile({required this.icon, required this.title, required this.subtitle, required this.value, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.12)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
+  Widget _aboutRow(String key, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(color: const Color(0xFF2E7D32).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: const Color(0xFF2E7D32), size: 20),
+          SizedBox(
+            width: 100,
+            child: Text(key,
+                style: GoogleFonts.instrumentSans(
+                    fontSize: 12, color: const Color(0xFF4A6B51))),
           ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(color: Color(0xFF1B3A1E), fontWeight: FontWeight.w600, fontSize: 14)),
-                Text(subtitle, style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 11)),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: const Color(0xFF2E7D32),
-            trackColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.selected)) return const Color(0xFF2E7D32).withValues(alpha: 0.25);
-              return Colors.grey.withValues(alpha: 0.2);
-            }),
+            child: Text(value,
+                style: GoogleFonts.instrumentSans(
+                    fontSize: 12, color: const Color(0xFF86A98E))),
           ),
         ],
       ),
     );
   }
-}
 
-class _InfoTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  const _InfoTile({required this.icon, required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2E7D32).withValues(alpha: 0.1)),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: const Color(0xFF2E7D32).withValues(alpha: 0.5), size: 18),
-          const SizedBox(width: 12),
-          Expanded(child: Text(title, style: const TextStyle(color: Color(0xFF6B7C6E), fontSize: 13))),
-          Text(subtitle, style: const TextStyle(color: Color(0xFF1B3A1E), fontSize: 13, fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
+  Widget _sectionLabel(String t) => Text(t,
+      style: GoogleFonts.dmMono(
+          fontSize: 10,
+          letterSpacing: 2.5,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF4A6B51)));
 }
