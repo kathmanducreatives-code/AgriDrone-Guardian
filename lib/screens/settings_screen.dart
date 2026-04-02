@@ -15,8 +15,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _ipController =
-      TextEditingController(text: '192.168.1.76');
+  final _ipController = TextEditingController(text: '192.168.1.76');
 
   static const _crops = [
     {'label': 'Rice', 'icon': Icons.grass},
@@ -40,16 +39,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final config = configAsync.value ?? AppConfig();
     final isOnline = statusAsync.value?.status.toLowerCase() == 'online';
 
+    if (_ipController.text != config.ip) {
+      _ipController.value = TextEditingValue(
+        text: config.ip,
+        selection: TextSelection.collapsed(offset: config.ip.length),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F0D),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0A0F0D),
         elevation: 0,
-        title: Text('Settings',
-            style: GoogleFonts.syne(
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
-                color: const Color(0xFFE8F5E9))),
+        title: Text(
+          'Settings',
+          style: GoogleFonts.syne(
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
+            color: const Color(0xFFE8F5E9),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
@@ -79,15 +88,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ok: true,
                     subtitle: 'agridrone-api.onrender.com',
                     trailingWidget: IconButton(
-                      icon: const Icon(Icons.copy_rounded, size: 16,
-                          color: Color(0xFF4A6B51)),
+                      icon: const Icon(
+                        Icons.copy_rounded,
+                        size: 16,
+                        color: Color(0xFF4A6B51),
+                      ),
                       onPressed: () {
-                        Clipboard.setData(const ClipboardData(
-                            text: 'https://agridrone-api.onrender.com'));
+                        Clipboard.setData(
+                          const ClipboardData(
+                            text: 'https://agridrone-api.onrender.com',
+                          ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Copied!',
-                                style: GoogleFonts.instrumentSans()),
+                            content: Text(
+                              'Copied!',
+                              style: GoogleFonts.instrumentSans(),
+                            ),
                             backgroundColor: const Color(0xFF1A2A1E),
                             duration: const Duration(seconds: 1),
                           ),
@@ -107,21 +124,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           color: const Color(0xFF38BDF8).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.router_rounded,
-                            color: Color(0xFF38BDF8), size: 18),
+                        child: const Icon(
+                          Icons.router_rounded,
+                          color: Color(0xFF38BDF8),
+                          size: 18,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextField(
                           controller: _ipController,
                           style: GoogleFonts.dmMono(
-                              fontSize: 13,
-                              color: const Color(0xFFE8F5E9)),
+                            fontSize: 13,
+                            color: const Color(0xFFE8F5E9),
+                          ),
                           decoration: InputDecoration(
                             labelText: 'Drone IP Address',
                             labelStyle: GoogleFonts.instrumentSans(
-                                fontSize: 12,
-                                color: const Color(0xFF4A6B51)),
+                              fontSize: 12,
+                              color: const Color(0xFF4A6B51),
+                            ),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -134,18 +156,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF4ADE80).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: const Color(0xFF4ADE80).withOpacity(0.3)),
+                              color: const Color(0xFF4ADE80).withOpacity(0.3),
+                            ),
                           ),
-                          child: Text('CONNECT',
-                              style: GoogleFonts.dmMono(
-                                  fontSize: 10,
-                                  letterSpacing: 1,
-                                  color: const Color(0xFF4ADE80))),
+                          child: Text(
+                            'CONNECT',
+                            style: GoogleFonts.dmMono(
+                              fontSize: 10,
+                              letterSpacing: 1,
+                              color: const Color(0xFF4ADE80),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -162,11 +190,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('CROP TYPE',
-                      style: GoogleFonts.dmMono(
-                          fontSize: 10,
-                          letterSpacing: 2,
-                          color: const Color(0xFF4A6B51))),
+                  Text(
+                    'CROP TYPE',
+                    style: GoogleFonts.dmMono(
+                      fontSize: 10,
+                      letterSpacing: 2,
+                      color: const Color(0xFF4A6B51),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -182,7 +213,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 14, vertical: 10),
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
                               decoration: BoxDecoration(
                                 color: selected
                                     ? const Color(0xFF4ADE80).withOpacity(0.12)
@@ -194,23 +227,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       : Colors.white.withOpacity(0.08),
                                 ),
                               ),
-                              child: Row(children: [
-                                Icon(icon,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    icon,
                                     size: 15,
                                     color: selected
                                         ? const Color(0xFF4ADE80)
-                                        : const Color(0xFF4A6B51)),
-                                const SizedBox(width: 6),
-                                Text(label,
+                                        : const Color(0xFF4A6B51),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    label,
                                     style: GoogleFonts.instrumentSans(
-                                        fontSize: 13,
-                                        fontWeight: selected
-                                            ? FontWeight.w600
-                                            : FontWeight.w400,
-                                        color: selected
-                                            ? const Color(0xFFE8F5E9)
-                                            : const Color(0xFF86A98E))),
-                              ]),
+                                      fontSize: 13,
+                                      fontWeight: selected
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                      color: selected
+                                          ? const Color(0xFFE8F5E9)
+                                          : const Color(0xFF86A98E),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );
@@ -223,24 +263,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('SCAN INTERVAL',
-                          style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              letterSpacing: 2,
-                              color: const Color(0xFF4A6B51))),
+                      Text(
+                        'SCAN INTERVAL',
+                        style: GoogleFonts.dmMono(
+                          fontSize: 10,
+                          letterSpacing: 2,
+                          color: const Color(0xFF4A6B51),
+                        ),
+                      ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4ADE80).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                            color: const Color(0xFF4ADE80).withOpacity(0.2),
+                          ),
                         ),
-                        child: Text('${config.scanInterval}s',
-                            style: GoogleFonts.dmMono(
-                                fontSize: 13,
-                                color: const Color(0xFF4ADE80))),
+                        child: Text(
+                          '${config.scanInterval}s',
+                          style: GoogleFonts.dmMono(
+                            fontSize: 13,
+                            color: const Color(0xFF4ADE80),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -248,11 +297,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: const Color(0xFF4ADE80),
-                      inactiveTrackColor:
-                          const Color(0xFF4ADE80).withOpacity(0.1),
+                      inactiveTrackColor: const Color(
+                        0xFF4ADE80,
+                      ).withOpacity(0.1),
                       thumbColor: const Color(0xFF4ADE80),
-                      overlayColor:
-                          const Color(0xFF4ADE80).withOpacity(0.15),
+                      overlayColor: const Color(0xFF4ADE80).withOpacity(0.15),
                       trackHeight: 3,
                     ),
                     child: Slider(
@@ -271,25 +320,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('CONFIDENCE THRESHOLD',
-                          style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              letterSpacing: 2,
-                              color: const Color(0xFF4A6B51))),
+                      Text(
+                        'CONFIDENCE THRESHOLD',
+                        style: GoogleFonts.dmMono(
+                          fontSize: 10,
+                          letterSpacing: 2,
+                          color: const Color(0xFF4A6B51),
+                        ),
+                      ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF4ADE80).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                            color: const Color(0xFF4ADE80).withOpacity(0.2),
+                          ),
                         ),
                         child: Text(
-                            '${(config.confidence * 100).toStringAsFixed(0)}%',
-                            style: GoogleFonts.dmMono(
-                                fontSize: 13,
-                                color: const Color(0xFF4ADE80))),
+                          '${(config.confidence * 100).toStringAsFixed(0)}%',
+                          style: GoogleFonts.dmMono(
+                            fontSize: 13,
+                            color: const Color(0xFF4ADE80),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -297,11 +354,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: const Color(0xFF4ADE80),
-                      inactiveTrackColor:
-                          const Color(0xFF4ADE80).withOpacity(0.1),
+                      inactiveTrackColor: const Color(
+                        0xFF4ADE80,
+                      ).withOpacity(0.1),
                       thumbColor: const Color(0xFF4ADE80),
-                      overlayColor:
-                          const Color(0xFF4ADE80).withOpacity(0.15),
+                      overlayColor: const Color(0xFF4ADE80).withOpacity(0.15),
                       trackHeight: 3,
                     ),
                     child: Slider(
@@ -334,24 +391,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           color: const Color(0xFF4ADE80).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: const Color(0xFF4ADE80).withOpacity(0.2)),
+                            color: const Color(0xFF4ADE80).withOpacity(0.2),
+                          ),
                         ),
-                        child: const Icon(Icons.hexagon_outlined,
-                            color: Color(0xFF4ADE80), size: 24),
+                        child: const Icon(
+                          Icons.hexagon_outlined,
+                          color: Color(0xFF4ADE80),
+                          size: 24,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('AgriDrone Guardian',
-                              style: GoogleFonts.syne(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: const Color(0xFFE8F5E9))),
-                          Text('Version 2.0.0 · Build 2404A',
-                              style: GoogleFonts.dmMono(
-                                  fontSize: 11,
-                                  color: const Color(0xFF4A6B51))),
+                          Text(
+                            'AgriDrone Guardian',
+                            style: GoogleFonts.syne(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFFE8F5E9),
+                            ),
+                          ),
+                          Text(
+                            'Version 2.0.0 · Build 2404A',
+                            style: GoogleFonts.dmMono(
+                              fontSize: 11,
+                              color: const Color(0xFF4A6B51),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -363,8 +430,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _aboutRow('Institution', 'Islington College'),
                   _aboutRow('Validated by', 'London Metropolitan University'),
                   _aboutRow('Firebase Project', 'agridrone-guardian'),
-                  _aboutRow('Inference Engine',
-                      'YOLOv8 · FastAPI · Render.com'),
+                  _aboutRow(
+                    'Inference Engine',
+                    'YOLOv8 · FastAPI · Render.com',
+                  ),
                 ],
               ),
             ),
@@ -399,14 +468,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label,
-                  style: GoogleFonts.instrumentSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFFE8F5E9))),
-              Text(subtitle,
-                  style: GoogleFonts.dmMono(
-                      fontSize: 10, color: const Color(0xFF4A6B51))),
+              Text(
+                label,
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFFE8F5E9),
+                ),
+              ),
+              Text(
+                subtitle,
+                style: GoogleFonts.dmMono(
+                  fontSize: 10,
+                  color: const Color(0xFF4A6B51),
+                ),
+              ),
             ],
           ),
         ),
@@ -417,14 +493,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               PulsingDot(color: color, size: 6)
             else
               Container(
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                      color: color, shape: BoxShape.circle)),
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
             const SizedBox(width: 6),
-            Text(status,
-                style: GoogleFonts.dmMono(
-                    fontSize: 10, letterSpacing: 1, color: color)),
+            Text(
+              status,
+              style: GoogleFonts.dmMono(
+                fontSize: 10,
+                letterSpacing: 1,
+                color: color,
+              ),
+            ),
           ],
         ),
       ],
@@ -439,24 +520,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           SizedBox(
             width: 100,
-            child: Text(key,
-                style: GoogleFonts.instrumentSans(
-                    fontSize: 12, color: const Color(0xFF4A6B51))),
+            child: Text(
+              key,
+              style: GoogleFonts.instrumentSans(
+                fontSize: 12,
+                color: const Color(0xFF4A6B51),
+              ),
+            ),
           ),
           Expanded(
-            child: Text(value,
-                style: GoogleFonts.instrumentSans(
-                    fontSize: 12, color: const Color(0xFF86A98E))),
+            child: Text(
+              value,
+              style: GoogleFonts.instrumentSans(
+                fontSize: 12,
+                color: const Color(0xFF86A98E),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _sectionLabel(String t) => Text(t,
-      style: GoogleFonts.dmMono(
-          fontSize: 10,
-          letterSpacing: 2.5,
-          fontWeight: FontWeight.w500,
-          color: const Color(0xFF4A6B51)));
+  Widget _sectionLabel(String t) => Text(
+    t,
+    style: GoogleFonts.dmMono(
+      fontSize: 10,
+      letterSpacing: 2.5,
+      fontWeight: FontWeight.w500,
+      color: const Color(0xFF4A6B51),
+    ),
+  );
 }

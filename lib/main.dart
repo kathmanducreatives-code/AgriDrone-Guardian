@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 import 'screens/dashboard_screen.dart';
+import 'screens/device_lab_screen.dart';
 import 'screens/live_stream_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/field_map_screen.dart';
@@ -13,9 +14,7 @@ import 'screens/settings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const ProviderScope(child: AgriDroneApp()));
 }
 
@@ -27,7 +26,9 @@ class AgriDroneTheme {
   static const Color danger = Color(0xFFF87171);
   static const Color textPrimary = Color(0xFFE8F5E9);
   static const Color textSecondary = Color(0xFF86A98E);
-  static final Color borderHighlight = const Color(0xFF4ADE80).withOpacity(0.15);
+  static final Color borderHighlight = const Color(
+    0xFF4ADE80,
+  ).withOpacity(0.15);
 
   static ThemeData get themeData {
     return ThemeData(
@@ -44,18 +45,75 @@ class AgriDroneTheme {
         onSurface: textPrimary,
       ),
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.syne(fontWeight: FontWeight.w800, color: textPrimary, fontSize: 36, letterSpacing: -1.0),
-        displayMedium: GoogleFonts.syne(fontWeight: FontWeight.w800, color: textPrimary, fontSize: 28, letterSpacing: -0.5),
-        displaySmall: GoogleFonts.syne(fontWeight: FontWeight.w800, color: textPrimary, fontSize: 22, letterSpacing: -0.5),
-        headlineMedium: GoogleFonts.syne(fontWeight: FontWeight.w700, color: textPrimary, fontSize: 20),
-        headlineSmall: GoogleFonts.syne(fontWeight: FontWeight.w700, color: textPrimary, fontSize: 18),
-        titleLarge: GoogleFonts.syne(fontWeight: FontWeight.w800, color: textPrimary, fontSize: 16, letterSpacing: 0.5),
-        bodyLarge: GoogleFonts.instrumentSans(fontWeight: FontWeight.w500, color: textPrimary, fontSize: 18),
-        bodyMedium: GoogleFonts.instrumentSans(fontWeight: FontWeight.w400, color: textPrimary, fontSize: 16, letterSpacing: 0.2),
-        bodySmall: GoogleFonts.instrumentSans(fontWeight: FontWeight.w400, color: textSecondary, fontSize: 13, letterSpacing: 0.3),
-        labelLarge: GoogleFonts.dmMono(fontWeight: FontWeight.w500, color: textPrimary, fontSize: 18, letterSpacing: 1.0),
-        labelMedium: GoogleFonts.dmMono(fontWeight: FontWeight.w400, color: textPrimary, fontSize: 14, letterSpacing: 0.8),
-        labelSmall: GoogleFonts.dmMono(fontWeight: FontWeight.w500, color: textSecondary, fontSize: 11, letterSpacing: 1.2),
+        displayLarge: GoogleFonts.syne(
+          fontWeight: FontWeight.w800,
+          color: textPrimary,
+          fontSize: 36,
+          letterSpacing: -1.0,
+        ),
+        displayMedium: GoogleFonts.syne(
+          fontWeight: FontWeight.w800,
+          color: textPrimary,
+          fontSize: 28,
+          letterSpacing: -0.5,
+        ),
+        displaySmall: GoogleFonts.syne(
+          fontWeight: FontWeight.w800,
+          color: textPrimary,
+          fontSize: 22,
+          letterSpacing: -0.5,
+        ),
+        headlineMedium: GoogleFonts.syne(
+          fontWeight: FontWeight.w700,
+          color: textPrimary,
+          fontSize: 20,
+        ),
+        headlineSmall: GoogleFonts.syne(
+          fontWeight: FontWeight.w700,
+          color: textPrimary,
+          fontSize: 18,
+        ),
+        titleLarge: GoogleFonts.syne(
+          fontWeight: FontWeight.w800,
+          color: textPrimary,
+          fontSize: 16,
+          letterSpacing: 0.5,
+        ),
+        bodyLarge: GoogleFonts.instrumentSans(
+          fontWeight: FontWeight.w500,
+          color: textPrimary,
+          fontSize: 18,
+        ),
+        bodyMedium: GoogleFonts.instrumentSans(
+          fontWeight: FontWeight.w400,
+          color: textPrimary,
+          fontSize: 16,
+          letterSpacing: 0.2,
+        ),
+        bodySmall: GoogleFonts.instrumentSans(
+          fontWeight: FontWeight.w400,
+          color: textSecondary,
+          fontSize: 13,
+          letterSpacing: 0.3,
+        ),
+        labelLarge: GoogleFonts.dmMono(
+          fontWeight: FontWeight.w500,
+          color: textPrimary,
+          fontSize: 18,
+          letterSpacing: 1.0,
+        ),
+        labelMedium: GoogleFonts.dmMono(
+          fontWeight: FontWeight.w400,
+          color: textPrimary,
+          fontSize: 14,
+          letterSpacing: 0.8,
+        ),
+        labelSmall: GoogleFonts.dmMono(
+          fontWeight: FontWeight.w500,
+          color: textSecondary,
+          fontSize: 11,
+          letterSpacing: 1.2,
+        ),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: background,
@@ -115,6 +173,7 @@ class _AppShellState extends State<AppShell> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     LiveStreamScreen(),
+    DeviceLabScreen(),
     ReportScreen(),
     FieldMapScreen(),
     SettingsScreen(),
@@ -131,8 +190,8 @@ class _AppShellState extends State<AppShell> {
             top: BorderSide(
               color: const Color(0xFF4ADE80).withOpacity(0.15),
               width: 1.0,
-            )
-          )
+            ),
+          ),
         ),
         child: Theme(
           data: Theme.of(context).copyWith(
@@ -153,14 +212,46 @@ class _AppShellState extends State<AppShell> {
             showUnselectedLabels: true,
             selectedItemColor: const Color(0xFF4ADE80),
             unselectedItemColor: const Color(0xFF4A6B51),
-            selectedLabelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: const Color(0xFF4ADE80), fontWeight: FontWeight.bold),
-            unselectedLabelStyle: Theme.of(context).textTheme.labelSmall?.copyWith(color: const Color(0xFF4A6B51)),
+            selectedLabelStyle: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(
+                  color: const Color(0xFF4ADE80),
+                  fontWeight: FontWeight.bold,
+                ),
+            unselectedLabelStyle: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(color: const Color(0xFF4A6B51)),
             items: [
-              _buildBottomNavItem(0, Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'),
-              _buildBottomNavItem(1, Icons.videocam_outlined, Icons.videocam, 'Live'),
-              _buildBottomNavItem(2, Icons.analytics_outlined, Icons.analytics, 'Report'),
-              _buildBottomNavItem(3, Icons.map_outlined, Icons.map, 'Map'),
-              _buildBottomNavItem(4, Icons.settings_outlined, Icons.settings, 'Settings'),
+              _buildBottomNavItem(
+                0,
+                Icons.dashboard_outlined,
+                Icons.dashboard,
+                'Dashboard',
+              ),
+              _buildBottomNavItem(
+                1,
+                Icons.videocam_outlined,
+                Icons.videocam,
+                'Live',
+              ),
+              _buildBottomNavItem(
+                2,
+                Icons.science_outlined,
+                Icons.science,
+                'Lab',
+              ),
+              _buildBottomNavItem(
+                3,
+                Icons.analytics_outlined,
+                Icons.analytics,
+                'Report',
+              ),
+              _buildBottomNavItem(4, Icons.map_outlined, Icons.map, 'Map'),
+              _buildBottomNavItem(
+                5,
+                Icons.settings_outlined,
+                Icons.settings,
+                'Settings',
+              ),
             ],
           ),
         ),
@@ -168,10 +259,15 @@ class _AppShellState extends State<AppShell> {
     );
   }
 
-  BottomNavigationBarItem _buildBottomNavItem(int index, IconData outline, IconData filled, String label) {
+  BottomNavigationBarItem _buildBottomNavItem(
+    int index,
+    IconData outline,
+    IconData filled,
+    String label,
+  ) {
     final isActive = _currentIndex == index;
     final color = isActive ? const Color(0xFF4ADE80) : const Color(0xFF4A6B51);
-    
+
     return BottomNavigationBarItem(
       icon: Padding(
         padding: const EdgeInsets.only(bottom: 4.0),
@@ -189,8 +285,8 @@ class _AppShellState extends State<AppShell> {
                   shape: BoxShape.circle,
                 ),
               )
-            else 
-              const SizedBox(height: 8) // match height to prevent jumping
+            else
+              const SizedBox(height: 8), // match height to prevent jumping
           ],
         ),
       ),
