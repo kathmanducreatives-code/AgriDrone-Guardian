@@ -7,6 +7,8 @@ import 'firebase_options.dart';
 
 import 'screens/dashboard_screen.dart';
 import 'screens/live_stream_screen.dart';
+import 'screens/mission_screen.dart';
+import 'screens/photos_screen.dart';
 import 'screens/report_screen.dart';
 import 'screens/field_map_screen.dart';
 import 'screens/settings_screen.dart';
@@ -115,6 +117,8 @@ class _AppShellState extends State<AppShell> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     LiveStreamScreen(),
+    MissionScreen(),
+    PhotosScreen(),
     ReportScreen(),
     FieldMapScreen(),
     SettingsScreen(),
@@ -158,9 +162,11 @@ class _AppShellState extends State<AppShell> {
             items: [
               _buildBottomNavItem(0, Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'),
               _buildBottomNavItem(1, Icons.videocam_outlined, Icons.videocam, 'Live'),
-              _buildBottomNavItem(2, Icons.analytics_outlined, Icons.analytics, 'Report'),
-              _buildBottomNavItem(3, Icons.map_outlined, Icons.map, 'Map'),
-              _buildBottomNavItem(4, Icons.settings_outlined, Icons.settings, 'Settings'),
+              _buildBottomNavItem(2, Icons.flight_takeoff_outlined, Icons.flight_takeoff, 'Mission'),
+              _buildBottomNavItem(3, Icons.photo_library_outlined, Icons.photo_library, 'Photos'),
+              _buildBottomNavItem(4, Icons.analytics_outlined, Icons.analytics, 'Report'),
+              _buildBottomNavItem(5, Icons.map_outlined, Icons.map, 'Map'),
+              _buildBottomNavItem(6, Icons.settings_outlined, Icons.settings, 'Settings'),
             ],
           ),
         ),
