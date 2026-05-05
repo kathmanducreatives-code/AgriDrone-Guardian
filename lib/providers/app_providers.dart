@@ -1,26 +1,269 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/drone_models.dart';
+import '../models/drone_status_v3.dart';
+import '../models/drone_log.dart';
 import '../models/photo_model.dart';
 import '../services/backend_service.dart';
+import '../services/drone_service.dart';
+import '../services/supabase_service.dart';
 
-final firebaseDatabaseProvider = Provider<FirebaseDatabase>((ref) {
-  return FirebaseDatabase.instance;
+// ─────────────────────────────────────────────────────────────────────────────
+//  ESP32 IP — persisted in SharedPreferences so it survives hot-reloads
+// ─────────────────────────────────────────────────────────────────────────────
+
+class Esp32IpNotifier extends Notifier<String> {
+  static const _key = 'esp32_ip';
+
+  @override
+  String build() {
+    _loadSaved();
+    return '192.168.1.76'; // default until loaded
+  }
+
+  Future<void> _loadSaved() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_key);
+    if (saved != null && saved.trim().isNotEmpty) {
+      state = saved.trim();
+    }
+  }
+
+  Future<void> set(String ip) async {
+    final trimmed = ip.trim();
+    if (trimmed == state) return;
+    state = trimmed;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, trimmed);
+  }
+}
+
+final esp32IpProvider =
+    NotifierProvider<Esp32IpNotifier, String>(() => Esp32IpNotifier());
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  DroneService instance — recreated when IP changes
+// ─────────────────────────────────────────────────────────────────────────────
+
+final droneServiceProvider = Provider<DroneService>((ref) {
+  final ip = ref.watch(esp32IpProvider);
+  return DroneService(ip);
 });
+
+final supabaseServiceProvider = Provider<SupabaseService>(
+  (_) => SupabaseService(),
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  ESP32 live status — polls /status every 3 s
+//  Emits null when drone is unreachable (UI shows "offline")
+// ─────────────────────────────────────────────────────────────────────────────
+
+final esp32StatusProvider = StreamProvider.autoDispose<DroneStatusV3?>((ref) {
+  final service = ref.watch(droneServiceProvider);
+  return service.statusStream(intervalSeconds: 3);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Supabase capture logs — async, refreshed manually
+// ─────────────────────────────────────────────────────────────────────────────
+
+class DroneLogsNotifier extends AsyncNotifier<List<DroneLog>> {
+  @override
+  Future<List<DroneLog>> build() =>
+      ref.read(supabaseServiceProvider).fetchCaptures();
+
+  Future<void> refresh({String? sessionId}) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => ref.read(supabaseServiceProvider).fetchCaptures(
+            sessionId: sessionId,
+          ),
+    );
+  }
+}
+
+final droneLogsProvider =
+    AsyncNotifierProvider<DroneLogsNotifier, List<DroneLog>>(
+        () => DroneLogsNotifier());
+
+// GPS track for field map (loaded on demand)
+final gpsTrackProvider =
+    FutureProvider.autoDispose.family<List<DroneLog>, String>(
+  (ref, sessionId) =>
+      ref.read(supabaseServiceProvider).fetchGpsTrack(sessionId: sessionId),
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Mission state — wired to ESP32 /session endpoints
+// ─────────────────────────────────────────────────────────────────────────────
+
+class MissionState {
+  final bool sessionActive;
+  final String sessionId;
+  final int captureCount;
+  final bool isAutoCapturing;
+  final String? lastError;
+  final List<int>? lastPreviewBytes; // raw JPEG of last capture
+
+  const MissionState({
+    this.sessionActive = false,
+    this.sessionId = '',
+    this.captureCount = 0,
+    this.isAutoCapturing = false,
+    this.lastError,
+    this.lastPreviewBytes,
+  });
+
+  MissionState copyWith({
+    bool? sessionActive,
+    String? sessionId,
+    int? captureCount,
+    bool? isAutoCapturing,
+    String? lastError,
+    List<int>? lastPreviewBytes,
+    bool clearError = false,
+    bool clearPreview = false,
+  }) {
+    return MissionState(
+      sessionActive: sessionActive ?? this.sessionActive,
+      sessionId: sessionId ?? this.sessionId,
+      captureCount: captureCount ?? this.captureCount,
+      isAutoCapturing: isAutoCapturing ?? this.isAutoCapturing,
+      lastError: clearError ? null : (lastError ?? this.lastError),
+      lastPreviewBytes:
+          clearPreview ? null : (lastPreviewBytes ?? this.lastPreviewBytes),
+    );
+  }
+}
+
+class MissionNotifier extends Notifier<MissionState> {
+  Timer? _autoCaptureTimer;
+
+  @override
+  MissionState build() => const MissionState();
+
+  DroneService get _svc => ref.read(droneServiceProvider);
+
+  // ── Sync state FROM /status poll so counters stay live ──
+  void syncFromStatus(DroneStatusV3 s) {
+    // Only update passively — don't override isAutoCapturing
+    state = state.copyWith(
+      sessionActive: s.sessionActive,
+      sessionId: s.sessionId,
+      captureCount: s.captureCount,
+    );
+  }
+
+  // ── Session lifecycle ─────────────────────────────────────
+  Future<void> startSession() async {
+    try {
+      final id = await _svc.startSession();
+      state = state.copyWith(
+        sessionActive: true,
+        sessionId: id,
+        captureCount: 0,
+        clearError: true,
+      );
+    } catch (e) {
+      state = state.copyWith(lastError: 'Start failed: $e');
+    }
+  }
+
+  Future<void> stopSession() async {
+    _stopAutoCapture();
+    try {
+      await _svc.stopSession();
+      state = state.copyWith(
+        sessionActive: false,
+        isAutoCapturing: false,
+        clearError: true,
+      );
+      // Refresh Supabase photo list after session ends
+      ref.read(droneLogsProvider.notifier).refresh();
+    } catch (e) {
+      state = state.copyWith(lastError: 'Stop failed: $e');
+    }
+  }
+
+  // ── Manual single capture ─────────────────────────────────
+  Future<void> takeSnapshot() async {
+    try {
+      final bytes = await _svc.capture();
+      state = state.copyWith(
+        lastPreviewBytes: bytes,
+        captureCount: state.captureCount + 1,
+        clearError: true,
+      );
+    } catch (e) {
+      state = state.copyWith(lastError: 'Capture failed: $e');
+    }
+  }
+
+  // ── Auto-capture (timed interval) ────────────────────────
+  Future<void> startAutoCapture({int intervalMs = 5000}) async {
+    if (state.isAutoCapturing) return;
+    if (!state.sessionActive) {
+      await startSession();
+      if (!state.sessionActive) return; // start failed
+    }
+    state = state.copyWith(isAutoCapturing: true);
+    _scheduleCapture(intervalMs);
+  }
+
+  void _scheduleCapture(int intervalMs) {
+    _autoCaptureTimer?.cancel();
+    _autoCaptureTimer = Timer(Duration(milliseconds: intervalMs), () async {
+      if (!state.isAutoCapturing) return;
+      try {
+        final bytes = await _svc.capture();
+        state = state.copyWith(
+          lastPreviewBytes: bytes,
+          captureCount: state.captureCount + 1,
+          clearError: true,
+        );
+      } catch (e) {
+        state = state.copyWith(lastError: 'Auto-capture: $e');
+      }
+      if (state.isAutoCapturing) _scheduleCapture(intervalMs);
+    });
+  }
+
+  void stopAutoCapture() {
+    _stopAutoCapture();
+    state = state.copyWith(isAutoCapturing: false);
+  }
+
+  void _stopAutoCapture() {
+    _autoCaptureTimer?.cancel();
+    _autoCaptureTimer = null;
+  }
+}
+
+final missionProvider =
+    NotifierProvider<MissionNotifier, MissionState>(() => MissionNotifier());
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Legacy Firebase providers (kept for backward compat with report screen etc.)
+// ─────────────────────────────────────────────────────────────────────────────
+
+final firebaseDatabaseProvider = Provider<FirebaseDatabase>(
+  (_) => FirebaseDatabase.instance,
+);
 
 final droneStatusProvider = StreamProvider<DroneStatus>((ref) {
   final db = ref.watch(firebaseDatabaseProvider);
-  return db.ref('drone').onValue.map((event) {
-    return DroneStatus.fromSnapshot(event.snapshot);
-  });
+  return db.ref('drone').onValue.map((e) => DroneStatus.fromSnapshot(e.snapshot));
 });
 
 final latestDetectionProvider = StreamProvider<Detection>((ref) {
   final db = ref.watch(firebaseDatabaseProvider);
-  return db.ref('detection/latest').onValue.map((event) {
-    return Detection.fromSnapshot(event.snapshot);
-  });
+  return db
+      .ref('detection/latest')
+      .onValue
+      .map((e) => Detection.fromSnapshot(e.snapshot));
 });
 
 final detectionHistoryProvider = StreamProvider<List<Detection>>((ref) {
@@ -29,11 +272,9 @@ final detectionHistoryProvider = StreamProvider<List<Detection>>((ref) {
     if (!event.snapshot.exists) return [];
     final map = event.snapshot.value as Map<dynamic, dynamic>?;
     if (map == null) return [];
-    
     List<Detection> history = [];
     map.forEach((key, value) {
       if (value is Map) {
-        // Value includes timestamp as key usually, or embedded. 
         final d = Detection.fromMap(value);
         history.add(Detection(
           disease: d.disease,
@@ -44,7 +285,6 @@ final detectionHistoryProvider = StreamProvider<List<Detection>>((ref) {
         ));
       }
     });
-
     history.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     return history;
   });
@@ -52,221 +292,47 @@ final detectionHistoryProvider = StreamProvider<List<Detection>>((ref) {
 
 final soilDataProvider = StreamProvider<SoilData>((ref) {
   final db = ref.watch(firebaseDatabaseProvider);
-  return db.ref('soil').onValue.map((event) {
-    return SoilData.fromSnapshot(event.snapshot);
-  });
+  return db.ref('soil').onValue.map((e) => SoilData.fromSnapshot(e.snapshot));
 });
 
 final configProvider = StreamProvider<AppConfig>((ref) {
   final db = ref.watch(firebaseDatabaseProvider);
-  return db.ref('config').onValue.map((event) {
-    return AppConfig.fromSnapshot(event.snapshot);
-  });
+  return db.ref('config').onValue.map((e) => AppConfig.fromSnapshot(e.snapshot));
 });
 
-final commandProvider = Provider<void>((ref) {
-  // A helper function provider to write commands easily if needed
-  return;
-});
+// ─────────────────────────────────────────────────────────────────────────────
+//  Backend service (FastAPI — used for IP discovery)
+// ─────────────────────────────────────────────────────────────────────────────
 
-// A helper FutureProvider to send a scan command
-Future<void> triggerScanCommand() async {
-  final ref = FirebaseDatabase.instance.ref('drone/command');
-  await ref.set('scan');
-}
+final backendServiceProvider = Provider<BackendService>(
+  (_) => BackendService(),
+);
 
-Future<void> updateConfig(String key, dynamic value) async {
-  final ref = FirebaseDatabase.instance.ref('config/$key');
-  await ref.set(value);
-}
-
-// ─── Mission state ───────────────────────────────────────────────────────────
-
-class MissionState {
-  final String? flightId;
-  final String? missionFolder;
-  final int sessionCapturedCount;
-  final bool isAutoCapturing;
-  final int patchIndex;
-  final String esp32Ip;
-  final String? lastError;
-  final Map<String, dynamic>? cameraStatus;
-
-  const MissionState({
-    this.flightId,
-    this.missionFolder,
-    this.sessionCapturedCount = 0,
-    this.isAutoCapturing = false,
-    this.patchIndex = 0,
-    this.esp32Ip = '172.17.163.199',
-    this.lastError,
-    this.cameraStatus,
-  });
-
-  MissionState copyWith({
-    String? flightId,
-    String? missionFolder,
-    int? sessionCapturedCount,
-    bool? isAutoCapturing,
-    int? patchIndex,
-    String? esp32Ip,
-    String? lastError,
-    Map<String, dynamic>? cameraStatus,
-    bool clearFlightId = false,
-    bool clearMissionFolder = false,
-    bool clearError = false,
-    bool clearCameraStatus = false,
-  }) {
-    return MissionState(
-      flightId: clearFlightId ? null : (flightId ?? this.flightId),
-      missionFolder: clearMissionFolder ? null : (missionFolder ?? this.missionFolder),
-      sessionCapturedCount: sessionCapturedCount ?? this.sessionCapturedCount,
-      isAutoCapturing: isAutoCapturing ?? this.isAutoCapturing,
-      patchIndex: patchIndex ?? this.patchIndex,
-      esp32Ip: esp32Ip ?? this.esp32Ip,
-      lastError: clearError ? null : (lastError ?? this.lastError),
-      cameraStatus: clearCameraStatus ? null : (cameraStatus ?? this.cameraStatus),
-    );
-  }
-}
-
-class MissionNotifier extends Notifier<MissionState> {
-  final BackendService _backend = BackendService();
-  Timer? _autoCaptureTimer;
-
-  @override
-  MissionState build() => const MissionState();
-
-  void setEsp32Ip(String ip) {
-    if (ip == state.esp32Ip) return;
-    _stopAutoCapture();
-    state = state.copyWith(esp32Ip: ip, clearFlightId: true, clearMissionFolder: true);
-  }
-
-  /// Auto-discover the ESP32 IP from the FastAPI device registry.
-  /// Called on startup so the app always uses the latest IP without manual config.
-  Future<void> autoDiscoverIp({String deviceId = 'esp32-drone-01'}) async {
-    final ip = await _backend.fetchDeviceIp(deviceId);
-    if (ip != null && ip.trim().isNotEmpty && ip.trim() != state.esp32Ip) {
-      state = state.copyWith(esp32Ip: ip.trim());
-    }
-  }
-
-  Future<void> fetchCameraStatus() async {
-    try {
-      final status = await _backend.getCameraStatus(state.esp32Ip);
-      state = state.copyWith(cameraStatus: status, clearError: true);
-    } catch (e) {
-      state = state.copyWith(lastError: e.toString());
-    }
-  }
-
-  Future<bool> setCameraControl(String varName, int val) async {
-    try {
-      await _backend.setCameraControl(state.esp32Ip, varName, val);
-      await fetchCameraStatus();
-      return true;
-    } catch (e) {
-      state = state.copyWith(lastError: e.toString());
-      return false;
-    }
-  }
-
-  Future<void> startAutoCapture({
-    required String deviceId,
-    int captureIntervalMs = 5000,
-    String cropType = 'rice',
-  }) async {
-    if (state.isAutoCapturing) return;
-    try {
-      final flight = await _backend.createFlight(
-        deviceId: deviceId,
-        cropType: cropType,
-        captureIntervalMs: captureIntervalMs,
-      );
-      final flightId = flight['flight_id'] as String;
-      final missionFolder = flight['storage_folder'] as String?;
-      state = state.copyWith(
-        flightId: flightId,
-        missionFolder: missionFolder,
-        isAutoCapturing: true,
-        patchIndex: 0,
-        sessionCapturedCount: 0,
-        clearError: true,
-      );
-      _scheduleCapture(captureIntervalMs, cropType);
-    } catch (e) {
-      state = state.copyWith(lastError: 'Failed to start mission: $e');
-    }
-  }
-
-  void _scheduleCapture(int intervalMs, String cropType) {
-    _autoCaptureTimer?.cancel();
-    _autoCaptureTimer = Timer(Duration(milliseconds: intervalMs), () async {
-      await _doCapture(cropType);
-      if (state.isAutoCapturing) _scheduleCapture(intervalMs, cropType);
-    });
-  }
-
-  Future<void> _doCapture(String cropType) async {
-    final flightId = state.flightId;
-    if (flightId == null) return;
-    try {
-      await _backend.esp32Capture(
-        flightId: flightId,
-        esp32Ip: state.esp32Ip,
-        patchIndex: state.patchIndex,
-        cropType: cropType,
-      );
-      state = state.copyWith(
-        patchIndex: state.patchIndex + 1,
-        sessionCapturedCount: state.sessionCapturedCount + 1,
-        clearError: true,
-      );
-    } catch (e) {
-      state = state.copyWith(lastError: 'Capture failed: $e');
-    }
-  }
-
-  void stopAutoCapture() {
-    _stopAutoCapture();
-    state = state.copyWith(
-      isAutoCapturing: false,
-      clearFlightId: true,
-      clearMissionFolder: true,
-      sessionCapturedCount: 0,
-      patchIndex: 0,
-    );
-  }
-
-  void _stopAutoCapture() {
-    _autoCaptureTimer?.cancel();
-    _autoCaptureTimer = null;
-  }
-
-  @override
-  void dispose() {
-    _autoCaptureTimer?.cancel();
-  }
-}
-
-final missionProvider = NotifierProvider<MissionNotifier, MissionState>(() => MissionNotifier());
-
-// ─── Photos ──────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+//  Legacy photos (kept for report screen, uses FastAPI)
+// ─────────────────────────────────────────────────────────────────────────────
 
 class PhotosNotifier extends AsyncNotifier<List<PhotoModel>> {
-  final BackendService _backend = BackendService();
-
   @override
-  Future<List<PhotoModel>> build() => _backend.listPhotos(limit: 100);
+  Future<List<PhotoModel>> build() =>
+      ref.read(backendServiceProvider).listPhotos(limit: 100);
 
   Future<void> load({String? flightId}) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
-      () => _backend.listPhotos(flightId: flightId, limit: 100),
+      () => ref
+          .read(backendServiceProvider)
+          .listPhotos(flightId: flightId, limit: 100),
     );
   }
 }
 
 final photosProvider =
-    AsyncNotifierProvider<PhotosNotifier, List<PhotoModel>>(() => PhotosNotifier());
+    AsyncNotifierProvider<PhotosNotifier, List<PhotoModel>>(
+        () => PhotosNotifier());
+
+// Helpers kept for settings screen
+Future<void> updateConfig(String key, dynamic value) async {
+  final ref = FirebaseDatabase.instance.ref('config/$key');
+  await ref.set(value);
+}
